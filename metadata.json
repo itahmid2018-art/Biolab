@@ -1,0 +1,6 @@
+{
+  "name": "BioFocus - Minimal Learning Studio for Curious Minds",
+  "description": "A minimalist, distraction-free bioscience learning environment with dark mode focus, interactive 3D molecular exploration, NotebookLM study summaries, and friendly AI tutor characters.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
