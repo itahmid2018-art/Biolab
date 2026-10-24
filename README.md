@@ -56,11 +56,23 @@ Modern biological science is often taught through static 2D textbook drawings or
   - **Human DNA B-Form ($1BNA$)**: Antiparallel sugar-phosphate rails and complementary A-T / G-C base pairs.
   - **Green Fluorescent Protein ($1EMA$)**: 11-strand beta-barrel and glowing chromophore triad (*Ser65-Tyr66-Gly67*).
   - **Insulin Hormone ($1TRZ$)**: Stored hexamer with zinc coordination and active monomer keys stabilized by disulfide bridges.
-  - **Hemoglobin Submarine ($1A3N$)**: Four-subunit allosteric oxygen courier with heme iron ($Fe^{2+}$) centers.
   - **Antibody IgG ($1IGT$)**: Flexible Y-shaped shield with Fab antigen-binding clamps and Fc effector handles.
 
-### 3. Study Roadmap Flowchart & Next-Topic Engine
-- Visual flowchart linking foundational concepts to advanced systems.
+### 3. Cellular, Organelle & Tissue 3D/2D Inspector (Orbitals Architecture)
+Inspired by orbital and structural visualizer concepts (such as the *Orbitals* project), BioFocus extends beyond isolated molecules into living cellular and tissue models:
+- **Multipolar Motor Neuron (`neuron-cell`)**:
+  - **3D Spatial Mesh**: Soma cell body with displaced membrane, nucleus, dendritic arborization with receptive micro-spines, axon hillock, myelinated axon with segmented Schwann cell wraps, and distal synaptic terminal boutons.
+  - **Real-Time Action Potential Simulation**: Propagating $+35\text{ mV}$ electrical depolarization wave jumping along Nodes of Ranvier via $120\text{ m/s}$ saltatory conduction.
+  - **Interactive Cutaway & Exploded View**: Depth sliders (0-100%) to peel back the phospholipid myelin sheath and expose underlying axoplasm and ion channels.
+  - **2D Anatomical Schematic**: Labeled interactive hotspot pins with live physiological readouts ($-70\text{ mV}$ resting potential, ~10,000 synaptic inputs).
+- **Mitochondrion Bioenergetic Powerhouse (`mitochondria-organelle`)**:
+  - **3D Double-Membrane Cutaway**: Outer membrane studded with VDAC porin channels, intermembrane proton reservoir, deeply folded cristae sheets, viscous matrix, and circular double-stranded mtDNA plasmids.
+  - **Active $F_0F_1$ ATP Synthase Nanomotors**: Membrane-embedded rotary turbines spinning at 6,000 RPM as $H^+$ protons rush across the electrochemical gradient ($\Delta \text{pH } 1.4$).
+  - **Bioenergetics Boost**: Interactive toggle to accelerate ATP generation and stream proton particle cascades.
+- **Microscopic Compartments Breakdown**: Comprehensive breakdown cards with anatomical location, cellular role, scale/dimensions, and direct Socratic Q&A hooks to Sofia Carter.
+
+### 4. Study Roadmap Flowchart & Next-Topic Engine
+- Visual flowchart linking foundational concepts across 7 tiers (from Methane and Glucose to Mitochondria and Motor Neurons).
 - Node statuses: **Mastered** (green checkmark, score $\ge 70\%$), **In Progress** (active study), **Recommended Next** (pulsing badge), and **Locked** (prerequisite required).
 - Contextual tutor recommendations explaining *why* a topic should be explored next.
 

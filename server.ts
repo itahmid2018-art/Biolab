@@ -37,7 +37,8 @@ async function generateGeminiWithFallback(params: {
   temperature?: number;
 }): Promise<string | null> {
   if (!ai) return null;
-  const modelsToTry = ['gemini-3.8-flash', 'gemini-flash-latest'];
+  // Use gemini-3.8-flash as primary model and gemini-3.1-flash-lite as high-throughput resilient fallback
+  const modelsToTry = ['gemini-3.8-flash', 'gemini-3.1-flash-lite'];
 
   for (const model of modelsToTry) {
     try {
@@ -52,19 +53,21 @@ async function generateGeminiWithFallback(params: {
       });
 
       const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout after 4.5s')), 4500)
+        setTimeout(() => reject(new Error('Generation timeout')), 9000)
       );
 
       const response = await Promise.race([generatePromise, timeoutPromise]);
       if (response && response.text) {
         return response.text;
       }
-    } catch (err: any) {
-      console.warn(`Upstream call to ${model} encountered issue (${err.message?.slice(0, 80)}). Checking fallback...`);
+    } catch {
+      // Quietly wait briefly and test fallback model
+      await new Promise((resolve) => setTimeout(resolve, 350));
     }
   }
   return null;
 }
+
 
 // In-memory cache for scientific structures to minimize redundant upstream requests
 const pdbCache = new Map<string, string>();
@@ -403,10 +406,10 @@ Respond strictly as JSON.`;
     }
 
     return res.json(parsed);
-  } catch (err: any) {
-    console.warn('Error in /api/tutor/chat, returning fallback:', err.message);
+  } catch {
     return res.json(fallbackTutorResponse);
   }
+
 });
 
 // ==========================================
@@ -524,10 +527,10 @@ Generate the personalized study notebook artifacts in strict JSON.`;
     }
 
     return res.json(fallback);
-  } catch (err: any) {
-    console.warn('Error in /api/notebook/summarize, safely returning fallback:', err.message);
+  } catch {
     return res.json(fallback);
   }
+
 });
 
 // ==========================================
@@ -670,10 +673,10 @@ ${sourceText}
     }
 
     return res.json(fallbackQuiz);
-  } catch (err: any) {
-    console.warn('Error in /api/notebook/quiz, safely returning fallback:', err.message);
+  } catch {
     return res.json(fallbackQuiz);
   }
+
 });
 
 // ==========================================
@@ -753,10 +756,10 @@ Evaluate generously for a young student.`;
     } catch {
       return res.json(fallbackEvaluation());
     }
-  } catch (err: any) {
-    console.warn('Error evaluating short answer, returning fallback:', err.message);
+  } catch {
     return res.json(fallbackEvaluation());
   }
+
 });
 
 // ==========================================
@@ -1266,14 +1269,14 @@ Please generate the comprehensive, engaging topic JSON tailored to this student.
       relevanceExplanation: `Specially prepared for ${studentName}!`,
       relatedTopicSuggestions: ['Photosynthesis', 'CRISPR Gene Editing', 'Antibodies'],
     });
-  } catch (err: any) {
-    console.warn('Error in /api/topics/ai-explore, returning fallback:', err.message);
+  } catch {
     return res.json({
       topic: fallbackTopic,
       relevanceExplanation: `Specially matched to your search!`,
       relatedTopicSuggestions: ['Photosynthesis', 'CRISPR', 'Vaccines'],
     });
   }
+
 });
 
 // Health check endpoint

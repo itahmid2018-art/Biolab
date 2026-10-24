@@ -25,9 +25,12 @@ export interface Topic {
   molecularWeight?: string;
   iupacName?: string;
   hasMolecularStructure?: boolean;
-  structureType?: 'molecule_3d' | 'dna_helix' | 'protein' | 'small_molecule';
+  structureType?: 'molecule_3d' | 'dna_helix' | 'protein' | 'small_molecule' | 'cell_organelle' | 'neuron' | 'mitochondria' | 'tissue';
   chemicalCompounds?: ChemicalCompoundInfo[];
   molecularLabels?: MolecularLabel[];
+  cellularCompartments?: CellularCompartmentInfo[];
+  cellularMetrics?: Record<string, string>;
+  simulationType?: 'action_potential' | 'proton_gradient' | 'sarcomere_contraction';
   sdfCoordinates?: string;
   svgDiagram2D?: string;
   molecularHighlights?: Array<{
@@ -36,6 +39,18 @@ export interface Topic {
     description: string;
   }>;
 }
+
+export interface CellularCompartmentInfo {
+  id: string;
+  name: string;
+  tag: string;
+  color: string;
+  location: string;
+  function: string;
+  dimensions?: string;
+  keyMolecules?: string[];
+}
+
 
 export interface ChemicalCompoundInfo {
   name: string;

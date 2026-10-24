@@ -19,7 +19,9 @@ import {
   FlaskConical,
 } from 'lucide-react';
 import * as $3Dmol from '3dmol';
-import { Topic, ChemicalCompoundInfo, MolecularLabel, Character } from '../types';
+import { Topic, ChemicalCompoundInfo, MolecularLabel, Character, CellularCompartmentInfo } from '../types';
+import { CellOrganelle3DViewer } from './CellOrganelle3DViewer';
+import { CellOrganelle2DViewer } from './CellOrganelle2DViewer';
 
 interface MolecularStructureHeroProps {
   topic: Topic;
@@ -42,6 +44,15 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   
+  const isCellular =
+    topic.structureType === 'neuron' ||
+    topic.structureType === 'mitochondria' ||
+    topic.structureType === 'cell_organelle' ||
+    topic.structureType === 'tissue' ||
+    Boolean(topic.cellularCompartments && topic.cellularCompartments.length > 0);
+
+  const [selectedCellularComp, setSelectedCellularComp] = useState<CellularCompartmentInfo | null>(null);
+
   // Default to 'stick' (Ball & Stick) for small molecules like Sugar & Methane, and 'cartoon' for DNA & proteins
   const isSmallMolecule = topic.structureType === 'small_molecule' || topic.id === 'sugar-glucose' || topic.id === 'methane-molecule';
   const [renderStyle, setRenderStyle] = useState<'stick' | 'sphere' | 'cartoon'>(
@@ -61,9 +72,9 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
     }
   }, [topic.id, isSmallMolecule]);
 
-  // Initialize 3Dmol viewer canvas
+  // Initialize 3Dmol viewer canvas (only for non-cellular molecular topics)
   useEffect(() => {
-    if (viewMode !== '3d' || !containerRef.current) return;
+    if (isCellular || viewMode !== '3d' || !containerRef.current) return;
 
     try {
       containerRef.current.innerHTML = '';
@@ -110,7 +121,7 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
 
   // Load structure coordinates
   useEffect(() => {
-    if (viewMode !== '3d') return;
+    if (isCellular || viewMode !== '3d') return;
     const viewer = viewerRef.current;
     if (!viewer) return;
 
@@ -438,26 +449,30 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-3.5 bg-gradient-to-r from-indigo-50/80 via-white to-slate-50/80 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/40 border-b border-indigo-100 dark:border-indigo-950">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white shadow-2xs">
-            <FlaskConical className="w-5 h-5" />
+            {isCellular ? <Atom className="w-5 h-5" /> : <FlaskConical className="w-5 h-5" />}
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                 {topic.title.split(':')[0]}
               </span>
-              {topic.chemicalFormula && (
+              {isCellular ? (
+                <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-mono font-bold text-xs border border-emerald-200 dark:border-emerald-800">
+                  {topic.structureType === 'neuron' ? 'Cellular / Nerve Model' : topic.structureType === 'mitochondria' ? 'Organelle / ATP Engine' : 'Tissue Model'}
+                </span>
+              ) : topic.chemicalFormula ? (
                 <span className="px-2.5 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-200 font-mono font-bold text-xs border border-indigo-200 dark:border-indigo-800">
                   {topic.chemicalFormula}
                 </span>
-              )}
-              {topic.pdbId && (
+              ) : null}
+              {topic.pdbId && !isCellular && (
                 <span className="font-mono text-xs text-slate-500 dark:text-slate-400">
                   PDB: {topic.pdbId}
                 </span>
               )}
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              {topic.subtitle || 'Molecular Structure & Chemical Compounds'}
+              {topic.subtitle || (isCellular ? 'Cellular Architecture & Biological Dynamics' : 'Molecular Structure & Chemical Compounds')}
             </p>
           </div>
         </div>
@@ -469,31 +484,31 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
             <button
               type="button"
               onClick={() => setViewMode('3d')}
-              className={`px-3 py-1 rounded-lg font-semibold flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                 viewMode === '3d'
                   ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Atom className="w-3.5 h-3.5" />
-              <span>3D Model</span>
+              <span>{isCellular ? '3D Orbital Mesh' : '3D Model'}</span>
             </button>
             <button
               type="button"
               onClick={() => setViewMode('2d')}
-              className={`px-3 py-1 rounded-lg font-semibold flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                 viewMode === '2d'
                   ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Binary className="w-3.5 h-3.5" />
-              <span>2D Diagram</span>
+              <span>{isCellular ? '2D Cutaway Schematic' : '2D Diagram'}</span>
             </button>
           </div>
 
-          {/* 3D-specific Controls: Rotate & Reset */}
-          {viewMode === '3d' && (
+          {/* 3D-specific Controls for Molecules: Rotate & Reset */}
+          {!isCellular && viewMode === '3d' && (
             <div className="flex items-center gap-1">
               <button
                 type="button"
@@ -521,58 +536,80 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
         </div>
       </div>
 
-      {/* 2. Main Visual Canvas (3D WebGL or 2D SVG) */}
-      <div className="relative w-full h-[360px] sm:h-[420px] bg-slate-950 overflow-hidden cursor-grab active:cursor-grabbing select-none">
-        {viewMode === '3d' ? (
-          <>
-            <div ref={containerRef} className="w-full h-full" />
+      {/* 2. Main Visual Canvas */}
+      {isCellular ? (
+        // ----------------- CELLULAR & ORGANELLE CANVAS -----------------
+        <div>
+          {viewMode === '3d' ? (
+            <CellOrganelle3DViewer
+              topic={topic}
+              darkMode={darkMode}
+              onSelectCompartment={(comp) => setSelectedCellularComp(comp)}
+              onAskTutor={onAskQuestionAboutGroup}
+            />
+          ) : (
+            <CellOrganelle2DViewer
+              topic={topic}
+              darkMode={darkMode}
+              activeCharacter={activeCharacter}
+              onAskTutor={onAskQuestionAboutGroup}
+            />
+          )}
+        </div>
+      ) : (
+        // ----------------- MOLECULAR 3DMOL CANVAS -----------------
+        <div className="relative w-full h-[360px] sm:h-[420px] bg-slate-950 overflow-hidden cursor-grab active:cursor-grabbing select-none">
+          {viewMode === '3d' ? (
+            <>
+              <div ref={containerRef} className="w-full h-full" />
 
-            {/* Loading Spinner */}
-            {loading && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-xs text-white z-10">
-                <div className="w-8 h-8 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin mb-3" />
-                <p className="text-xs font-semibold text-slate-200">
-                  Rendering 3D atomic coordinates for {topic.title.split(':')[0]}...
-                </p>
-                <p className="text-[11px] text-slate-400 mt-1">Interactive WebGL Ball & Stick Modeling</p>
+              {/* Loading Spinner */}
+              {loading && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-xs text-white z-10">
+                  <div className="w-8 h-8 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin mb-3" />
+                  <p className="text-xs font-semibold text-slate-200">
+                    Rendering 3D atomic coordinates for {topic.title.split(':')[0]}...
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-1">Interactive WebGL Ball & Stick Modeling</p>
+                </div>
+              )}
+
+              {/* Error fallback */}
+              {loadError && !loading && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-slate-950 text-slate-200 z-10 text-center">
+                  <Info className="w-8 h-8 text-amber-400 mb-2" />
+                  <p className="text-sm font-semibold text-slate-100">{loadError}</p>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('2d')}
+                    className="mt-3 px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold"
+                  >
+                    View 2D Structural Diagram Instead
+                  </button>
+                </div>
+              )}
+
+              {/* Clicked Atom Tooltip */}
+              {activeHighlightAtom && (
+                <div className="absolute top-3 left-3 z-20 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700 text-white text-xs shadow-md">
+                  <span className="text-cyan-400 font-semibold">Selected Atom: </span>
+                  <span className="font-mono">{activeHighlightAtom}</span>
+                </div>
+              )}
+
+              {/* Instructions */}
+              <div className="absolute bottom-2 right-3 z-10 pointer-events-none text-[10px] text-slate-400 bg-slate-900/70 px-2 py-0.5 rounded-sm backdrop-blur-xs">
+                Drag: Rotate · Scroll: Zoom · Click: Inspect Atom
               </div>
-            )}
+            </>
+          ) : (
+            render2DDiagram()
+          )}
+        </div>
+      )}
 
-            {/* Error fallback */}
-            {loadError && !loading && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-slate-950 text-slate-200 z-10 text-center">
-                <Info className="w-8 h-8 text-amber-400 mb-2" />
-                <p className="text-sm font-semibold text-slate-100">{loadError}</p>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('2d')}
-                  className="mt-3 px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold"
-                >
-                  View 2D Structural Diagram Instead
-                </button>
-              </div>
-            )}
-
-            {/* Clicked Atom Tooltip */}
-            {activeHighlightAtom && (
-              <div className="absolute top-3 left-3 z-20 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700 text-white text-xs shadow-md">
-                <span className="text-cyan-400 font-semibold">Selected Atom: </span>
-                <span className="font-mono">{activeHighlightAtom}</span>
-              </div>
-            )}
-
-            {/* Instructions */}
-            <div className="absolute bottom-2 right-3 z-10 pointer-events-none text-[10px] text-slate-400 bg-slate-900/70 px-2 py-0.5 rounded-sm backdrop-blur-xs">
-              Drag: Rotate · Scroll: Zoom · Click: Inspect Atom
-            </div>
-          </>
-        ) : (
-          render2DDiagram()
-        )}
-      </div>
-
-      {/* 3D Representation Style Switcher (Stick, Sphere, Cartoon) */}
-      {viewMode === '3d' && (
+      {/* 3D Representation Style Switcher for Molecules */}
+      {!isCellular && viewMode === '3d' && (
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-2.5 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800 text-xs">
           <div className="flex items-center gap-2">
             <span className="text-slate-500 dark:text-slate-400 font-medium text-[11px] flex items-center gap-1">
@@ -622,8 +659,96 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
         </div>
       )}
 
-      {/* 3. CHEMICAL COMPOUNDS BREAKDOWN (Explicit requirement!) */}
-      {topic.chemicalCompounds && topic.chemicalCompounds.length > 0 && (
+      {/* 3. CELLULAR COMPARTMENTS & ANATOMICAL BREAKDOWN */}
+      {isCellular && topic.cellularCompartments && topic.cellularCompartments.length > 0 && (
+        <div className="px-4 sm:px-6 py-4 bg-white dark:bg-slate-900/95 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                Cellular Compartments &amp; Microscopic Machinery:
+              </h4>
+            </div>
+            <span className="text-[11px] text-slate-400">Click any compartment to inspect</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {topic.cellularCompartments.map((comp) => {
+              const isSelected = selectedCellularComp?.id === comp.id;
+              return (
+                <div
+                  key={comp.id}
+                  onClick={() => setSelectedCellularComp(isSelected ? null : comp)}
+                  className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                    isSelected
+                      ? 'border-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/60 shadow-xs ring-1 ring-indigo-500'
+                      : 'border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/50 hover:border-indigo-300 hover:bg-slate-100/60'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: comp.color }}
+                      aria-hidden="true"
+                    />
+                    <span className="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 bg-slate-200/80 dark:bg-slate-700/80 px-1.5 py-0.5 rounded">
+                      {comp.tag}
+                    </span>
+                  </div>
+                  <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    {comp.name}
+                  </div>
+                  <div className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">
+                    {comp.location}
+                  </div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-1">
+                    {comp.function}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Selected Compartment Detail Spotlight */}
+          {selectedCellularComp && (
+            <div className="mt-3 p-3.5 rounded-xl bg-indigo-50/90 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-xs text-slate-800 dark:text-slate-200 flex flex-wrap items-center justify-between gap-3 animate-in fade-in duration-150">
+              <div className="space-y-1 max-w-xl">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-indigo-950 dark:text-indigo-200 text-sm">
+                    {selectedCellularComp.name}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-200 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
+                    {selectedCellularComp.tag}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-300">
+                  {selectedCellularComp.function}
+                </p>
+                <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                  <span>Location: {selectedCellularComp.location}</span>
+                  {selectedCellularComp.dimensions && <span>· Scale: {selectedCellularComp.dimensions}</span>}
+                  {selectedCellularComp.keyMolecules && (
+                    <span>· Molecules: {selectedCellularComp.keyMolecules.join(', ')}</span>
+                  )}
+                </div>
+              </div>
+
+              {onAskQuestionAboutGroup && (
+                <button
+                  type="button"
+                  onClick={() => onAskQuestionAboutGroup(`Tell me more about how the ${selectedCellularComp.name} functions in the ${topic.title.split(':')[0]}!`)}
+                  className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shrink-0 transition-colors shadow-2xs cursor-pointer"
+                >
+                  Ask Tutor About This Compartment →
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 4. CHEMICAL COMPOUNDS BREAKDOWN (For molecules) */}
+      {!isCellular && topic.chemicalCompounds && topic.chemicalCompounds.length > 0 && (
         <div className="px-4 sm:px-6 py-4 bg-white dark:bg-slate-900/95 border-t border-slate-100 dark:border-slate-800">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -708,8 +833,8 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
         </div>
       )}
 
-      {/* 4. LABELED ATOMS & BOND ANNOTATIONS */}
-      {topic.molecularLabels && topic.molecularLabels.length > 0 && (
+      {/* 5. LABELED ATOMS & BOND ANNOTATIONS (For molecules) */}
+      {!isCellular && topic.molecularLabels && topic.molecularLabels.length > 0 && (
         <div className="px-4 sm:px-6 py-3 bg-slate-50/70 dark:bg-slate-900/60 border-t border-slate-100 dark:border-slate-800">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1 shrink-0">
@@ -771,7 +896,7 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
         </div>
       )}
 
-      {/* 5. Sofia Carter / Active Tutor Empathetic Explanation of the Structure */}
+      {/* 6. Sofia Carter / Active Tutor Empathetic Explanation of the Structure */}
       {activeCharacter && (
         <div className="px-4 sm:px-6 py-3 bg-indigo-50/50 dark:bg-indigo-950/30 border-t border-indigo-100/70 dark:border-indigo-900/40 flex items-start gap-3">
           <span className="text-2xl filter drop-shadow-2xs shrink-0 select-none">
@@ -782,7 +907,11 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
               <span>{activeCharacter.name} explains this structure:</span>
             </div>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-              {topic.id === 'sugar-glucose'
+              {topic.id === 'neuron-cell'
+                ? "Look at the glowing pulse traveling down the axon! The fatty green myelin sheaths insulate the wire so the electrical spark jumps between the pink Nodes of Ranvier at 120 meters per second. That is why your hand moves the instant you decide to catch a ball!"
+                : topic.id === 'mitochondria-organelle'
+                ? "Notice those deep red accordion folds inside! Evolution shaped those cristae to create massive surface area for thousands of green F0F1 ATP synthases. They spin like tiny water turbines at 6,000 RPM as protons rush through, charging up all your daily energy!"
+                : topic.id === 'sugar-glucose'
                 ? "Look at the ring! Plants bake sunlight into this sweet hexagonal wheel. Those red -OH arms grab water like tiny magnets, which is why sugar melts on your tongue so smoothly!"
                 : topic.id === 'methane-molecule'
                 ? "Notice how the 4 hydrogen arms point outward into a 3D pyramid! Each bond repels its neighbors equally, creating a perfect 109.5° tetrahedral balance."
@@ -796,3 +925,4 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
     </div>
   );
 };
+

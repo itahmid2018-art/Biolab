@@ -662,12 +662,277 @@ This reaction powers heating and cooking stoves worldwide. However, when methane
       },
     ],
   },
+  {
+    id: 'neuron-cell',
+    title: 'The Electric Messenger: Multipolar Motor Neuron',
+    subtitle: 'How specialized brain and nerve cells flash thoughts and commands at 120 m/s',
+    category: 'Neurobiology & Electrophysiology',
+    difficulty: 'Core Science',
+    readTime: '5 min read',
+    hasMolecularStructure: true,
+    structureType: 'neuron',
+    provenance: {
+      source: 'Human Brain Project & EM Connectomics',
+      type: 'Experimentally determined',
+      externalUrl: 'https://www.brain-map.org/',
+      experimentalMethod: 'Serial Block-Face Scanning Electron Microscopy (SBEM)',
+    },
+    cellularMetrics: {
+      potential: '-70 mV',
+      speed: '120 m/s (270 mph)',
+      synapses: '~10,000 inputs',
+      length: 'Up to 1.0 m (sciatic)',
+    },
+    summary:
+      'Neurons are the fundamental information superhighways of your nervous system. Each multipolar neuron features a star-shaped soma (cell body) that integrates electrical signals from a dense arbor of dendrites. When excitement crosses the -55 mV trigger threshold at the axon hillock, an all-or-none action potential leaps down the myelinated axon from one Node of Ranvier to the next, releasing chemical neurotransmitters at the synaptic cleft in less than one thousandth of a second!',
+    fullContent: `Close your eyes and wiggle your big toe. In a fraction of a second, an electrical message leaped from the motor cortex of your brain, down your spinal cord, and all the way to your foot! How do living cells send signals faster than a race car?
+    
+The secret is the specialized architecture of the Multipolar Neuron. Unlike round red blood cells or flat skin cells, neurons are shaped like miniature trees with long telephone cables.
+
+1. The Soma (Cell Body): The central metabolic factory of the neuron containing the nucleus, DNA blueprints, and ribosomes that manufacture neurotransmitters and proteins.
+2. The Dendritic Arbor: Thousands of branching arms studded with dendritic spines that receive incoming chemical signals from upstream neurons.
+3. The Axon Hillock (The Decision Engine): Where all incoming positive (EPSP) and negative (IPSP) electrical waves meet. If the voltage reaches -55 mV, voltage-gated sodium channels burst open!
+4. The Myelinated Axon & Schwann Sheaths: A long biological transmission wire wrapped in fatty phospholipid insulation called myelin. This prevents electrical charge from leaking into surrounding tissue.
+5. Nodes of Ranvier: Uninsulated gaps spaced evenly along the axon. Voltage jumps directly from node to node at 120 meters per second (saltatory conduction), conserving massive metabolic energy!
+6. Synaptic Boutons & Neurotransmitter Vesicles: At the distal nerve endings, action potentials trigger calcium influx, causing synaptic vesicles to fuse with the membrane and shower chemical messengers (like acetylcholine or dopamine) across the 20-nanometer synaptic cleft.`,
+    funFact:
+      'The longest single neuron in the human body is the sciatic motor neuron: its cell body is in your lower spinal cord, and its axon stretches all the way to your big toe—over 3 feet (1 meter) long!',
+    keyQuestions: [
+      'How does the sodium-potassium pump (Na+/K+ ATPase) maintain the -70 mV resting potential?',
+      'Why does myelin increase nerve conduction speed by more than 10-fold?',
+      'What happens at the synaptic cleft when calcium ions trigger vesicle fusion?',
+    ],
+    vocabulary: [
+      {
+        term: 'Action Potential',
+        definition: 'A brief, rapid reversal of electrical membrane potential (+35 mV) that propagates along an axon.',
+      },
+      {
+        term: 'Saltatory Conduction',
+        definition: 'The rapid jumping of nerve impulses from one Node of Ranvier to the next along a myelinated axon.',
+      },
+      {
+        term: 'Synapse',
+        definition: 'The microscopic junction across which a neuron sends neurotransmitter signals to a target cell.',
+      },
+      {
+        term: 'Myelin Sheath',
+        definition: 'A multi-layered lipid wrap produced by glial cells (Schwann cells or oligodendrocytes) that insulates nerve fibers.',
+      },
+    ],
+    cellularCompartments: [
+      {
+        id: 'soma',
+        name: 'Soma (Perikaryon)',
+        tag: 'Metabolic Core',
+        color: '#6366f1',
+        location: 'Neuronal Body',
+        function: 'Houses nucleus, Nissl bodies, and Golgi apparatus; synthesizes structural neurofilaments and neurotransmitters.',
+        dimensions: '20-50 µm diameter',
+        keyMolecules: ['DNA/RNA', 'Neurofilaments', 'Ribosomes', 'Mitochondria'],
+      },
+      {
+        id: 'nucleus',
+        name: 'Neuronal Nucleus',
+        tag: 'Genetic Blueprint',
+        color: '#a855f7',
+        location: 'Center of Soma',
+        function: 'Euchromatic spherical nucleus with prominent nucleolus transcribing genes for receptor proteins and ion channels.',
+        dimensions: '8-12 µm diameter',
+        keyMolecules: ['Genomic DNA', 'Histones', 'RNA Polymerase II'],
+      },
+      {
+        id: 'dendrites',
+        name: 'Dendritic Arbor & Spines',
+        tag: 'Signal Receivers',
+        color: '#818cf8',
+        location: 'Radiating from Soma',
+        function: 'Extensive branched processes containing postsynaptic density receptors (AMPA, NMDA) that collect inputs from ~10,000 synapses.',
+        dimensions: '100-500 µm span',
+        keyMolecules: ['AMPA Receptors', 'NMDA Receptors', 'Actin Cytoskeleton'],
+      },
+      {
+        id: 'axon-hillock',
+        name: 'Axon Hillock',
+        tag: 'Trigger Zone',
+        color: '#f59e0b',
+        location: 'Junction of Soma & Axon',
+        function: 'High density of voltage-gated Nav1.6 sodium channels; calculates sum of EPSPs/IPSPs to fire all-or-none action potentials at -55 mV.',
+        dimensions: '2-4 µm neck',
+        keyMolecules: ['Nav1.6 Channels', 'Kv7 Channels', 'Ankyrin-G'],
+      },
+      {
+        id: 'myelin-sheath',
+        name: 'Myelin Sheath (Schwann / Glial)',
+        tag: 'Electrical Insulator',
+        color: '#10b981',
+        location: 'Axonal Internodes',
+        function: 'Concentric lipid bilayers that reduce membrane capacitance and increase electrical resistance for high-speed saltatory conduction.',
+        dimensions: '200-1000 µm segment length',
+        keyMolecules: ['Myelin Basic Protein (MBP)', 'Sphingomyelin', 'Lipids'],
+      },
+      {
+        id: 'nodes-ranvier',
+        name: 'Nodes of Ranvier',
+        tag: 'Ionic Boosters',
+        color: '#ec4899',
+        location: 'Gaps Between Myelin Segments',
+        function: 'Unmyelinated gaps densely packed with Nav1.6 channels (~1,000/µm²) that regenerate action potentials during saltatory leaps.',
+        dimensions: '1 µm gap width',
+        keyMolecules: ['Nav1.6 Sodium Channels', 'Kv1 Potassium Channels'],
+      },
+      {
+        id: 'synapse-terminal',
+        name: 'Synaptic Boutons (Axon Terminals)',
+        tag: 'Chemical Transmitter',
+        color: '#ef4444',
+        location: 'Distal Arborization',
+        function: 'Contains synaptic vesicles filled with neurotransmitters; voltage-gated Cav2.1 channels trigger exocytosis into the 20 nm synaptic cleft.',
+        dimensions: '0.8-1.5 µm bulb',
+        keyMolecules: ['SNARE Complexes', 'Synaptotagmin', 'Acetylcholine/Glutamate'],
+      },
+    ],
+  },
+  {
+    id: 'mitochondria-organelle',
+    title: 'The ATP Powerhouse: Mitochondrion',
+    subtitle: 'The double-membrane bioenergetic battery generating 90% of your cellular energy',
+    category: 'Cellular Bioenergetics',
+    difficulty: 'Core Science',
+    readTime: '5 min read',
+    hasMolecularStructure: true,
+    structureType: 'mitochondria',
+    provenance: {
+      source: 'MitoCarta 3.0 & Cryo-EM Tomography',
+      type: 'Experimentally determined',
+      externalUrl: 'https://www.broadinstitute.org/mitocarta',
+      experimentalMethod: 'Cryo-Electron Tomography (Cryo-ET) at 3.2 Å',
+    },
+    cellularMetrics: {
+      potential: '-180 mV (ΔΨm)',
+      atpRate: '~30-32 ATP / glucose',
+      rotarySpeed: '6,000 RPM (F0F1)',
+      protonGrad: 'ΔpH 1.4',
+    },
+    summary:
+      'Inside almost every eukaryotic cell humming in your body sit hundreds of mitochondria. Encased within a protective outer membrane with VDAC porins, the inner mitochondrial membrane is folded into deep cristae sheets that massively expand surface area. Here, the electron transport chain pumps protons into the intermembrane space, creating a potent electrochemical battery that powers F0F1 ATP Synthase rotary turbines spinning at 6,000 RPM to churn out cellular ATP fuel!',
+    fullContent: `Every breath you take and every meal you digest has one ultimate microscopic destination: your mitochondria! Often called the "powerhouse of the cell," mitochondria are so unique that they even possess their own circular DNA (mtDNA) and ribosomes—living evidence that they descended from ancient symbiotic bacteria over 1.5 billion years ago.
+    
+1. Outer Mitochondrial Membrane (OMM): A smooth lipid bilayer envelope studded with VDAC (Voltage-Dependent Anion Channels) porins that permit small nutrient molecules under 5,000 Daltons to pass freely.
+2. Intermembrane Space (IMS): The high-voltage reservoir between the outer and inner membranes where respiratory complexes (I, III, IV) pump hydrogen ions (H+), building up a proton motive force with a steep ΔpH and -180 mV electrical potential.
+3. Inner Mitochondrial Membrane (IMM) & Cardiolipin: An impermeable, highly specialized barrier enriched with unique diphosphatidylglycerol lipids (cardiolipin) that prevents protons from leaking back into the matrix.
+4. Folded Cristae Sheets: Deep, accordion-like foldings of the inner membrane that multiply surface area by over 500%, providing real estate for millions of respiratory chain complexes and ATP synthases.
+5. F0F1 ATP Synthase Rotary Nanomotors: True biological turbines! As protons rush through the membrane-embedded F0 channel, they cause the central rotor stalk to spin at up to 6,000 RPM, forcing the F1 catalytic head to snap ADP and inorganic phosphate together into energetic ATP!
+6. Mitochondrial Matrix & mtDNA: The viscous interior soup containing pyruvate dehydrogenase, Krebs / Citric Acid Cycle enzymes, circular double-stranded mtDNA, and 70S mitoribosomes.`,
+    funFact:
+      'Your body synthesizes approximately its own entire body weight in ATP every single day! An average adult produces and hydrolyzes roughly 50 to 70 kilograms of ATP every 24 hours to stay alive.',
+    keyQuestions: [
+      'How does the proton motive force (Δp) drive the physical rotation of the ATP synthase turbine?',
+      'Why do mitochondria have their own circular DNA inherited exclusively from the maternal line?',
+      'How do cristae junctions regulate cytochrome c release during programmed cell death (apoptosis)?',
+    ],
+    vocabulary: [
+      {
+        term: 'Proton Motive Force (PMF)',
+        definition: 'The combined electrical potential (ΔΨ) and chemical pH gradient that drives protons back across the inner membrane.',
+      },
+      {
+        term: 'Cristae',
+        definition: 'The deep folds of the inner mitochondrial membrane that vastly increase surface area for ATP production.',
+      },
+      {
+        term: 'ATP Synthase',
+        definition: 'A rotary molecular motor that converts the electrochemical energy of a proton gradient into chemical bond energy in ATP.',
+      },
+      {
+        term: 'Endosymbiosis',
+        definition: 'The evolutionary process where an ancient host cell engulfed an aerobic alphaproteobacterium that became the modern mitochondrion.',
+      },
+    ],
+    cellularCompartments: [
+      {
+        id: 'outer-membrane',
+        name: 'Outer Mitochondrial Membrane (OMM)',
+        tag: 'Porin Envelope',
+        color: '#f97316',
+        location: 'Perimeter Capsule',
+        function: 'Permeable lipid envelope studded with VDAC channel porins permitting pyruvate, ions, and ATP/ADP exchange.',
+        dimensions: '0.5 - 1.0 µm diameter',
+        keyMolecules: ['VDAC Porins', 'TOM Complex', 'Bax/Bak'],
+      },
+      {
+        id: 'intermembrane-space',
+        name: 'Intermembrane Space (IMS)',
+        tag: 'Proton Reservoir',
+        color: '#38bdf8',
+        location: 'Between OMM & IMM',
+        function: 'Accumulates pumped H+ protons from Complexes I, III, and IV, establishing high electrochemical potential (-180 mV).',
+        dimensions: '10-20 nm gap',
+        keyMolecules: ['Protons (H+)', 'Cytochrome c', 'Adenylate Kinase'],
+      },
+      {
+        id: 'cristae-folds',
+        name: 'Inner Membrane Cristae Sheets',
+        tag: 'Bioenergetic Surface',
+        color: '#ef4444',
+        location: 'Invaginated Shelves',
+        function: 'Cardiolipin-rich folded membranes holding Electron Transport Chain Complexes (I-IV) and ATP Synthase dimers.',
+        dimensions: '20-40 nm cristae junctions',
+        keyMolecules: ['Complexes I-IV', 'Cardiolipin', 'Opa1 / MICOS'],
+      },
+      {
+        id: 'atp-synthase',
+        name: 'F0F1 ATP Synthase Rotary Nanomotors',
+        tag: 'Molecular Turbine',
+        color: '#22c55e',
+        location: 'Cristae Curvatures',
+        function: 'Driven by proton influx through F0 c-ring, spins central rotor at 6,000 RPM to synthesize ATP from ADP and Pi.',
+        dimensions: '10 nm head, 12 nm stalk',
+        keyMolecules: ['F0 c-ring', 'γ-subunit rotor', 'α3β3 F1 head'],
+      },
+      {
+        id: 'matrix',
+        name: 'Mitochondrial Matrix',
+        tag: 'Metabolic Engine',
+        color: '#d97706',
+        location: 'Central Gel Core',
+        function: 'Dense aqueous matrix holding Krebs Cycle enzymes (citrate synthase), acetyl-CoA, and fatty acid beta-oxidation machinery.',
+        dimensions: 'Dense colloidal matrix',
+        keyMolecules: ['Krebs Cycle Enzymes', 'NADH/FADH2', 'Pyruvate Dehydrogenase'],
+      },
+      {
+        id: 'mtdna',
+        name: 'Circular mtDNA Plasmids',
+        tag: 'Endosymbiont Genome',
+        color: '#06b6d4',
+        location: 'Matrix Nucleoids',
+        function: '16.5 kb circular double-stranded DNA encoding 13 essential respiratory chain subunits, 22 tRNAs, and 2 rRNAs.',
+        dimensions: '16,569 base pairs',
+        keyMolecules: ['mtDNA', 'TFAM', 'POLG Polymerase'],
+      },
+    ],
+  },
 ];
 
 // Helper to search and filter topics for user search
 export const searchCuratedTopics = (query: string): Topic | null => {
   const q = query.trim().toLowerCase();
   if (!q) return null;
+
+  // Direct keyword matching for cellular, organelle, and tissue models
+  if (q.includes('neuron') || q.includes('nerve') || q.includes('axon') || q.includes('action potential') || q.includes('synapse') || q.includes('brain cell')) {
+    return CURATED_TOPICS.find((t) => t.id === 'neuron-cell') || null;
+  }
+  if (q.includes('mitochond') || q.includes('powerhouse') || q.includes('atp') || q.includes('cristae') || q.includes('proton') || q.includes('bioenergetics')) {
+    return CURATED_TOPICS.find((t) => t.id === 'mitochondria-organelle') || null;
+  }
+  if (q.includes('cell') || q.includes('organelle') || q.includes('tissue')) {
+    // If generic "cell" or "organelle", return neuron or mitochondria
+    if (q.includes('energy') || q.includes('atp') || q.includes('organelle')) {
+      return CURATED_TOPICS.find((t) => t.id === 'mitochondria-organelle') || null;
+    }
+    return CURATED_TOPICS.find((t) => t.id === 'neuron-cell') || null;
+  }
 
   // Direct keyword matching for the user's specific examples
   if (q.includes('sugar') || q.includes('glucose') || q.includes('sucrose')) {

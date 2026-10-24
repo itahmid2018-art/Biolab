@@ -23,12 +23,12 @@ export const GoogleSearchLanding: React.FC<GoogleSearchLandingProps> = ({
   };
 
   const sampleSearches = [
-    { label: 'Sugar (Glucose & Sucrose)', icon: '🍬', query: 'Explain the structure of Sugar and its chemical compounds along with labels' },
-    { label: 'Methane (CH₄)', icon: '⚡', query: 'Explain the structure of Methane and its chemical compounds along with labels' },
-    { label: 'Human DNA Molecule', icon: '🧬', query: 'Explain the structure of Human DNA molecule and its chemical compounds along with labels' },
+    { label: 'Neuron (Action Potential)', icon: '🧠', query: 'Explain the 3D structure of a Neuron cell, its action potential and cellular compartments' },
+    { label: 'Mitochondria (ATP Engine)', icon: '⚡', query: 'Explain the structure of Mitochondria, cristae folds, and ATP synthase rotary engine' },
+    { label: 'Sugar (Glucose)', icon: '🍬', query: 'Explain the structure of Sugar and its chemical compounds along with labels' },
+    { label: 'Methane (CH₄)', icon: '📐', query: 'Explain the structure of Methane and its chemical compounds along with labels' },
+    { label: 'Human DNA Helix', icon: '🧬', query: 'Explain the structure of Human DNA molecule and its chemical compounds along with labels' },
     { label: 'GFP Lantern', icon: '💡', query: 'Explain the structure of Green Fluorescent Protein (GFP)' },
-    { label: 'Hemoglobin Submarine', icon: '🩸', query: 'Explain the structure of Hemoglobin and oxygen binding' },
-    { label: 'Insulin Key', icon: '🗝️', query: 'Explain the structure of Insulin hormone' },
   ];
 
   return (
@@ -48,7 +48,7 @@ export const GoogleSearchLanding: React.FC<GoogleSearchLandingProps> = ({
           BioFocus <span className="text-indigo-600 dark:text-indigo-400">AI</span>
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-md">
-          Explore 2D &amp; 3D molecular structures, chemical compounds, and labels with {activeCharacter.name}
+          Explore 2D &amp; 3D molecules, cellular organelles, and tissues with {activeCharacter.name}
         </p>
       </div>
 
@@ -63,10 +63,11 @@ export const GoogleSearchLanding: React.FC<GoogleSearchLandingProps> = ({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Explain the structure of Sugar, Methane, or Human DNA..."
+            placeholder="Search cells, organelles & molecules: Neuron, Mitochondria, Sugar, DNA, Methane..."
             className="w-full px-3.5 sm:px-4 py-3.5 sm:py-4 text-xs sm:text-base rounded-full bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden"
             autoFocus
           />
+
 
           {query && (
             <button
