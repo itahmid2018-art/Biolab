@@ -23,6 +23,7 @@ export const GoogleSearchLanding: React.FC<GoogleSearchLandingProps> = ({
   };
 
   const sampleSearches = [
+    { label: 'Cellular Structure (Animal Cell)', icon: '🔬', query: 'Explain the 3D diagram of the cellular structure, animal cell organelles and compartments' },
     { label: 'Neuron (Action Potential)', icon: '🧠', query: 'Explain the 3D structure of a Neuron cell, its action potential and cellular compartments' },
     { label: 'Mitochondria (ATP Engine)', icon: '⚡', query: 'Explain the structure of Mitochondria, cristae folds, and ATP synthase rotary engine' },
     { label: 'Sugar (Glucose)', icon: '🍬', query: 'Explain the structure of Sugar and its chemical compounds along with labels' },

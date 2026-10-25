@@ -8,6 +8,11 @@
 ## 📋 Table of Contents
 1. [Project Objectives & Philosophy](#-project-objectives--philosophy)
 2. [Core Feature Architecture](#-core-feature-architecture)
+   - [Minimal Google-Search Landing & Top Ask Feature](#1-minimal-google-search-landing--top-ask-feature)
+   - [Molecular Structure Hero (2D & 3D by Default)](#2-molecular-structure-hero-2d--3d-by-default)
+   - [Cellular, Organelle & Tissue 3D/2D Inspector](#3-cellular-organelle--tissue-3d2d-inspector-orbitals-architecture)
+   - [Study Roadmap Flowchart & Next-Topic Engine](#4-study-roadmap-flowchart--next-topic-engine)
+   - [Save for Later & Personal Reading List](#5-save-for-later--personal-reading-list)
 3. [System Architecture & Tech Stack](#-system-architecture--tech-stack)
 4. [Installation & Setup](#-installation--setup)
 5. [Local Development & Testing](#-local-development--testing)
@@ -75,6 +80,27 @@ Inspired by orbital and structural visualizer concepts (such as the *Orbitals* p
 - Visual flowchart linking foundational concepts across 7 tiers (from Methane and Glucose to Mitochondria and Motor Neurons).
 - Node statuses: **Mastered** (green checkmark, score $\ge 70\%$), **In Progress** (active study), **Recommended Next** (pulsing badge), and **Locked** (prerequisite required).
 - Contextual tutor recommendations explaining *why* a topic should be explored next.
+
+### 5. Save for Later & Personal Reading List (`RightSidebarDrawer`)
+Students can curate their personal bioscience study agenda through a complete bookmarking and revision system:
+- **Universal 1-Click Bookmarking**:
+  - Available across all learning surfaces: in the **Topic Selector Bar**, in the **Molecular Structure Hero** header, in the active topic metadata badges, and via the **Top Navigation Bar**.
+  - Visual indicators: Amber-filled bookmark badge with dynamic `"Saved"` / `"Save for Later"` state.
+  - Organization Incentives: Bookmarking a topic awards $+15\text{ XP}$ to encourage active study organization.
+- **Dedicated Reading List Panel in Right Sidebar Drawer**:
+  - **Docked Quick Access**: An amber bookmark button (`📑`) pinned to the right perimeter with a real-time badge count displays the number of active bookmarks.
+  - **Tool Drawer Tab**: Tabbed integration inside `RightSidebarDrawer` alongside *Virtual Tutor*, *3D Lab*, *Retention Quiz*, *Learning Passport*, and *Study Roadmap*.
+  - **Header Analytics**: Live counter showing total saved topics, aggregate estimated study duration (e.g., $18\text{ min total}$), and a 1-click button to save or remove the currently open topic.
+  - **Instant Search & Category Filter**: Real-time keyword filter across titles, summaries, and chemical formulas, supplemented by category chips (`All`, `Cells`, `Molecules`, `Genetics`).
+  - **Interactive Topic Study Cards**:
+    - Complete topic metadata (category, reading time, difficulty, PDB ID, and chemical formula).
+    - **Personal Study Revision Notes**: An inline note-taking area per topic with autosave, character counter, and last-edited timestamp so students can record mnemonics or exam tips.
+    - **"Study Now" Navigation**: Instantly opens the notebook and 2D/3D structure in the main workspace.
+    - **"Ask Tutor" Hook**: Pre-fills a tailored study inquiry to Sofia Carter directly focusing on that topic.
+    - **Remove Action**: 1-click removal with immediate UI feedback and list synchronization.
+  - **Study Checklist Export**: A `"Copy Study Checklist"` button formats the reading list into clean Markdown with checkboxes (`- [ ] Topic: Description`) for Notion, Obsidian, or Google Docs, awarding bonus $+15\text{ XP}$.
+  - **Curated Empty State**: If all bookmarks are cleared, the panel displays 1-click recommended starter topics to jumpstart the student's study queue.
+  - **Isolated Persistence**: Bookmarks and revision notes are stored per user in `localStorage` (`biofocus_saved_topics_<userId>` and `biofocus_reading_notes_<userId>`), remaining completely private and persisting between browser sessions.
 
 ---
 
@@ -183,6 +209,7 @@ Execute the following verification test scenarios locally:
 | **TC-04: Study Roadmap Navigation** | Click the 🗺️ Roadmap icon in top bar or right dock. | Flowchart renders 5 tiers. Mastered topics show green checkmarks; recommended next topic pulses with Sofia Carter's guidance. |
 | **TC-05: Socratic Ask Feature** | Ask a question via the top bar (e.g., *"Why does sugar dissolve in water?"*). | Sofia responds Socratically with citation highlights, reading-level adaptation, and voice synthesis support. |
 | **TC-06: Retention Quiz & XP** | Click 📝 Quiz in right panel, answer question, submit. | Instant feedback provided, XP awarded, and confetti fires on badge milestone. |
+| **TC-07: Save for Later & Reading List** | 1. Click "Save for Later" on any topic.<br>2. Open 📑 Reading List drawer from the right dock.<br>3. Write a revision note and click "Copy Study Checklist". | Topic displays saved status; Reading List displays aggregate read time; note persists across refreshes; Markdown checklist is copied to clipboard with celebratory XP award. |
 
 ---
 
@@ -269,8 +296,8 @@ Content-Security-Policy:
 
 ### 6. LocalStorage & Client State Sanitization
 
-- **Safe JSON Deserialization**: All reads from `localStorage` (`biofocus_student_progress`, `biofocus_active_user`, `biofocus_dark_mode`) are wrapped in `try/catch` defensive blocks with verified fallbacks (`DEFAULT_PROGRESS`). Corrupted or manipulated values gracefully reset to defaults rather than causing crashes.
-- **Type Guard Validation**: Restored user profile data is validated against the `UserProfile` schema before being applied to the application context.
+- **Safe JSON Deserialization**: All reads from `localStorage` (`biofocus_student_progress`, `biofocus_active_user`, `biofocus_dark_mode`, `biofocus_saved_topics_<userId>`, `biofocus_reading_notes_<userId>`) are wrapped in `try/catch` defensive blocks with verified fallbacks (`DEFAULT_PROGRESS`, default starter topics, empty note maps). Corrupted or manipulated values gracefully reset to defaults rather than causing crashes.
+- **Type Guard Validation**: Restored user profile data, reading notes, and bookmark arrays are validated before being applied to the application context. User notes are restricted to text payloads to eliminate script-injection vectors.
 
 ### 7. WebGL & 3D Canvas Sandboxing
 

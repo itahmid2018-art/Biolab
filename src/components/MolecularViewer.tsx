@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ExternalLink, RotateCcw, Play, Pause, Eye, Sparkles, Layers, Palette, Info } from 'lucide-react';
 import * as $3Dmol from '3dmol';
 import { Topic } from '../types';
+import { CellOrganelle3DViewer } from './CellOrganelle3DViewer';
 
 interface MolecularViewerProps {
   topic: Topic;
@@ -14,6 +15,30 @@ export const MolecularViewer: React.FC<MolecularViewerProps> = ({
   darkMode,
   onResidueSelect,
 }) => {
+  const isCellular =
+    topic.id === 'cellular-structure' ||
+    topic.structureType === 'neuron' ||
+    topic.structureType === 'mitochondria' ||
+    topic.structureType === 'cell_organelle' ||
+    topic.structureType === 'tissue' ||
+    Boolean(topic.cellularCompartments && topic.cellularCompartments.length > 0);
+
+  if (isCellular) {
+    return (
+      <div className="space-y-3">
+        <CellOrganelle3DViewer
+          topic={topic}
+          darkMode={darkMode}
+          onSelectCompartment={(comp) => {
+            if (onResidueSelect) {
+              onResidueSelect({ name: comp.name, resi: 1, chain: 'C' });
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<any>(null);
   const spinIntervalRef = useRef<number | null>(null);

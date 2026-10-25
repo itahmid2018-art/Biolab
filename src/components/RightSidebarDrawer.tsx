@@ -14,15 +14,17 @@ import {
   Flame,
   CheckCircle2,
   Compass,
+  Bookmark,
 } from 'lucide-react';
 import { Character, Topic, ReadingLevel, UserProfile, StudentProgress, TopicMastery } from '../types';
 import { MolecularViewer } from './MolecularViewer';
 import { InteractiveQuiz } from './InteractiveQuiz';
 import { TutorChat } from './TutorChat';
 import { StudyRoadmap } from './StudyRoadmap';
+import { ReadingListPanel } from './ReadingListPanel';
 import { BADGES } from '../data/badges';
 
-export type RightSidebarPanelType = 'tutor' | 'molecular' | 'quiz' | 'passport' | 'roadmap' | null;
+export type RightSidebarPanelType = 'tutor' | 'molecular' | 'quiz' | 'passport' | 'roadmap' | 'readingList' | null;
 
 interface RightSidebarDrawerProps {
   activePanel: RightSidebarPanelType;
@@ -45,6 +47,9 @@ interface RightSidebarDrawerProps {
   onOpenTutorProfile: (char: Character) => void;
   onOpenCharacterGallery: () => void;
   onOpenBadgesModal: () => void;
+  savedTopicIds?: string[];
+  onToggleSaveTopic?: (topicId: string) => void;
+  onAskTutorAboutTopic?: (topic: Topic, query?: string) => void;
 }
 
 export const RightSidebarDrawer: React.FC<RightSidebarDrawerProps> = ({
@@ -68,6 +73,9 @@ export const RightSidebarDrawer: React.FC<RightSidebarDrawerProps> = ({
   onOpenTutorProfile,
   onOpenCharacterGallery,
   onOpenBadgesModal,
+  savedTopicIds = [],
+  onToggleSaveTopic,
+  onAskTutorAboutTopic,
 }) => {
   const [isMaximized, setIsMaximized] = useState<boolean>(false);
 
@@ -174,6 +182,25 @@ export const RightSidebarDrawer: React.FC<RightSidebarDrawerProps> = ({
         >
           <Compass className="w-5 h-5" />
           <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-indigo-500 ring-2 ring-white dark:ring-slate-900" />
+        </button>
+
+        {/* Reading List / Save for Later Button (Icon Only) */}
+        <button
+          type="button"
+          onClick={() => togglePanel('readingList')}
+          className={`relative p-2.5 rounded-2xl border shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-105 ${
+            activePanel === 'readingList'
+              ? 'bg-amber-600 text-white border-amber-500 ring-2 ring-amber-400/50 shadow-amber-500/20'
+              : 'bg-white/95 dark:bg-slate-900/95 text-amber-600 dark:text-amber-400 border-slate-200 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-700'
+          }`}
+          title={`Reading List: ${savedTopicIds.length} Saved Topic${savedTopicIds.length === 1 ? '' : 's'}`}
+        >
+          <Bookmark className={`w-5 h-5 ${savedTopicIds.length > 0 ? 'fill-current' : ''}`} />
+          {savedTopicIds.length > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white font-bold text-[10px] flex items-center justify-center ring-2 ring-white dark:ring-slate-900">
+              {savedTopicIds.length}
+            </span>
+          )}
         </button>
       </aside>
 
@@ -300,6 +327,27 @@ export const RightSidebarDrawer: React.FC<RightSidebarDrawerProps> = ({
                     </div>
                   </>
                 )}
+
+                {activePanel === 'readingList' && (
+                  <>
+                    <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/80 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                      <Bookmark className="w-4 h-4 fill-amber-500" />
+                    </div>
+                    <div className="truncate">
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                          Reading List
+                        </h2>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
+                          {savedTopicIds.length} Saved
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                        Bookmarked topics for focused revision & Socratic review
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Window Controls */}
@@ -340,6 +388,13 @@ export const RightSidebarDrawer: React.FC<RightSidebarDrawerProps> = ({
                     className={`px-2 py-1 rounded-md transition-colors ${activePanel === 'roadmap' ? 'bg-white dark:bg-slate-700 font-semibold shadow-2xs' : 'text-slate-500 hover:text-slate-800'}`}
                   >
                     🗺️ Roadmap
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onSelectPanel('readingList')}
+                    className={`px-2 py-1 rounded-md transition-colors ${activePanel === 'readingList' ? 'bg-white dark:bg-slate-700 font-semibold shadow-2xs' : 'text-slate-500 hover:text-slate-800'}`}
+                  >
+                    📑 Saved ({savedTopicIds.length})
                   </button>
                 </div>
 
@@ -538,6 +593,32 @@ export const RightSidebarDrawer: React.FC<RightSidebarDrawerProps> = ({
                     activeCharacter={character}
                     onAwardXp={onAwardXp}
                     onClose={() => onSelectPanel(null)}
+                  />
+                </div>
+              )}
+
+              {activePanel === 'readingList' && (
+                <div className="p-1">
+                  <ReadingListPanel
+                    savedTopicIds={savedTopicIds}
+                    topics={topics.length > 0 ? topics : [topic]}
+                    activeTopic={topic}
+                    onSelectTopic={(selected) => {
+                      if (onSelectTopic) onSelectTopic(selected);
+                    }}
+                    onToggleSaveTopic={(topicId) => {
+                      if (onToggleSaveTopic) onToggleSaveTopic(topicId);
+                    }}
+                    onAskTutorAboutTopic={(selected, initialQuery) => {
+                      if (onAskTutorAboutTopic) {
+                        onAskTutorAboutTopic(selected, initialQuery);
+                      } else {
+                        onSelectPanel('tutor');
+                      }
+                    }}
+                    character={character}
+                    darkMode={darkMode}
+                    onAwardXp={onAwardXp}
                   />
                 </div>
               )}

@@ -29,6 +29,8 @@ interface FocusBarProps {
   onSignOut: () => void;
   onReturnToSearch?: () => void;
   onOpenRoadmap?: () => void;
+  onOpenReadingList?: () => void;
+  savedCount?: number;
 }
 
 export const FocusBar: React.FC<FocusBarProps> = ({
@@ -43,6 +45,8 @@ export const FocusBar: React.FC<FocusBarProps> = ({
   onSignOut,
   onReturnToSearch,
   onOpenRoadmap,
+  onOpenReadingList,
+  savedCount = 0,
 }) => {
   // Ambient Focus Timer state (in seconds)
   const [timerDuration, setTimerDuration] = useState<number>(15 * 60); // 15 mins default
@@ -236,6 +240,24 @@ export const FocusBar: React.FC<FocusBarProps> = ({
               title="Sign In / Create Profile"
             >
               <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            </button>
+          )}
+
+          {/* Reading List / Bookmarked Topics Drawer */}
+          {onOpenReadingList && (
+            <button
+              type="button"
+              onClick={onOpenReadingList}
+              className="relative p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-amber-600 dark:text-amber-400 border border-slate-200/60 dark:border-slate-700/60 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+              title={`Reading List (${savedCount} saved topics) · Study later`}
+              aria-label="Open reading list"
+            >
+              <BookMarked className="w-4 h-4" />
+              {savedCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-amber-500 text-[9px] font-bold text-white flex items-center justify-center leading-none ring-2 ring-white dark:ring-slate-900">
+                  {savedCount}
+                </span>
+              )}
             </button>
           )}
 

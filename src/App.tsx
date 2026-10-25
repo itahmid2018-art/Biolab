@@ -15,6 +15,8 @@ import {
   User,
   Filter,
   Users,
+  Bookmark,
+  BookMarked,
 } from 'lucide-react';
 import { Topic, Character, ReadingLevel, StudentProgress, TopicMastery, UserProfile } from './types';
 import { CURATED_TOPICS, searchCuratedTopics } from './data/curatedTopics';
@@ -121,6 +123,20 @@ export default function App() {
   const [activeRightPanel, setActiveRightPanel] = useState<RightSidebarPanelType>(null);
   const [isSideBySide, setIsSideBySide] = useState<boolean>(false);
 
+  // Saved Topics for Reading List (persisted per user or guest)
+  const [savedTopicIds, setSavedTopicIds] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const key = currentUser ? `biofocus_saved_topics_${currentUser.id}` : 'biofocus_saved_topics_guest';
+        const saved = localStorage.getItem(key);
+        if (saved) return JSON.parse(saved);
+      } catch {
+        // fallback
+      }
+    }
+    return ['cellular-structure', 'dna-double-helix'];
+  });
+
   const handleOpenAuth = (mode: 'signup' | 'signin' | 'profile' = 'signup') => {
     setAuthModalMode(mode);
     setIsAuthModalOpen(true);
@@ -186,6 +202,12 @@ export default function App() {
     localStorage.setItem(key, JSON.stringify(progress));
   }, [progress, currentUser]);
 
+  // Persist saved reading list topics
+  useEffect(() => {
+    const key = currentUser ? `biofocus_saved_topics_${currentUser.id}` : 'biofocus_saved_topics_guest';
+    localStorage.setItem(key, JSON.stringify(savedTopicIds));
+  }, [savedTopicIds, currentUser]);
+
   // Apply dark mode class to html element
   useEffect(() => {
     const root = document.documentElement;
@@ -220,6 +242,16 @@ export default function App() {
     } else {
       // New profile bonus
       handleAwardXp(30, 'Profile Created & Personalized');
+    }
+
+    // Load user's saved topics if exists
+    const userSaved = localStorage.getItem(`biofocus_saved_topics_${profile.id}`);
+    if (userSaved) {
+      try {
+        setSavedTopicIds(JSON.parse(userSaved));
+      } catch {
+        // keep
+      }
     }
 
     setShowAllTopicsOverride(false);
@@ -348,10 +380,25 @@ export default function App() {
     handleAwardXp(30, 'Created Custom Topic Notebook');
   };
 
+  const handleToggleSaveTopic = (topicId: string) => {
+    setSavedTopicIds((prev) => {
+      const isAlreadySaved = prev.includes(topicId);
+      if (isAlreadySaved) {
+        return prev.filter((id) => id !== topicId);
+      } else {
+        const found = topics.find((t) => t.id === topicId);
+        handleAwardXp(15, `Saved "${found ? found.title.split(':')[0] : 'Topic'}" to Reading List`);
+        return [...prev, topicId];
+      }
+    });
+  };
+
   const handleAskTutorAboutTerm = (term: string) => {
     setExternalPrompt(term);
     if (isFocusMode) {
       setFocusTab('tutor');
+    } else if (!isSideBySide) {
+      setActiveRightPanel('tutor');
     }
   };
 
@@ -415,6 +462,8 @@ export default function App() {
         onSignOut={handleSignOut}
         onReturnToSearch={() => setHasSearched(false)}
         onOpenRoadmap={() => setActiveRightPanel('roadmap')}
+        onOpenReadingList={() => setActiveRightPanel('readingList')}
+        savedCount={savedTopicIds.length}
       />
 
       {/* 1. MINIMAL GOOGLE SEARCH LANDING (Before search results appear) */}
@@ -459,6 +508,10 @@ export default function App() {
               setActiveTopic(newTopic);
               setHasSearched(true);
             }}
+            isSaved={savedTopicIds.includes(activeTopic.id)}
+            onToggleSave={() => handleToggleSaveTopic(activeTopic.id)}
+            onOpenReadingList={() => setActiveRightPanel('readingList')}
+            savedCount={savedTopicIds.length}
           />
 
           {/* Main Learning Canvas */}
@@ -494,6 +547,27 @@ export default function App() {
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
+                    onClick={() => handleToggleSaveTopic(activeTopic.id)}
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg border transition-colors ${
+                      savedTopicIds.includes(activeTopic.id)
+                        ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-700 shadow-2xs'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200/70 dark:hover:bg-slate-700'
+                    }`}
+                    title={savedTopicIds.includes(activeTopic.id) ? 'Remove from Reading List' : 'Save for Later in Reading List'}
+                  >
+                    <Bookmark className={`w-3.5 h-3.5 ${savedTopicIds.includes(activeTopic.id) ? 'fill-amber-500 text-amber-500' : 'text-slate-400'}`} />
+                    <span>{savedTopicIds.includes(activeTopic.id) ? 'Saved' : 'Save for Later'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveRightPanel('readingList')}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 transition-colors"
+                    title="Open Reading List Drawer"
+                  >
+                    <span>📑 List ({savedTopicIds.length})</span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setActiveRightPanel('molecular')}
                     className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 hover:bg-cyan-100 transition-colors"
                   >
@@ -509,7 +583,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setActiveRightPanel('passport')}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 transition-colors"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition-colors"
                   >
                     <span>🏆 {progress.totalXp} XP</span>
                   </button>
@@ -595,6 +669,8 @@ export default function App() {
                       darkMode={darkMode}
                       activeCharacter={activeCharacter}
                       onAskQuestionAboutGroup={(term) => handleAskTutorAboutTerm(term)}
+                      isSaved={savedTopicIds.includes(activeTopic.id)}
+                      onToggleSave={() => handleToggleSaveTopic(activeTopic.id)}
                     />
                     <NotebookOverview
                       topic={activeTopic}
@@ -614,6 +690,8 @@ export default function App() {
                     darkMode={darkMode}
                     activeCharacter={activeCharacter}
                     onAskQuestionAboutGroup={(term) => handleAskTutorAboutTerm(term)}
+                    isSaved={savedTopicIds.includes(activeTopic.id)}
+                    onToggleSave={() => handleToggleSaveTopic(activeTopic.id)}
                   />
                 )}
 
@@ -654,6 +732,8 @@ export default function App() {
                     darkMode={darkMode}
                     activeCharacter={activeCharacter}
                     onAskQuestionAboutGroup={(term) => handleAskTutorAboutTerm(term)}
+                    isSaved={savedTopicIds.includes(activeTopic.id)}
+                    onToggleSave={() => handleToggleSaveTopic(activeTopic.id)}
                   />
 
                   <NotebookOverview
@@ -716,6 +796,8 @@ export default function App() {
                   darkMode={darkMode}
                   activeCharacter={activeCharacter}
                   onAskQuestionAboutGroup={(term) => handleAskTutorAboutTerm(term)}
+                  isSaved={savedTopicIds.includes(activeTopic.id)}
+                  onToggleSave={() => handleToggleSaveTopic(activeTopic.id)}
                 />
 
                 {/* 2. Notebook Study Notes */}
@@ -756,6 +838,12 @@ export default function App() {
         onOpenTutorProfile={setTutorProfileCharacter}
         onOpenCharacterGallery={() => setIsCharacterGalleryOpen(true)}
         onOpenBadgesModal={() => setIsBadgesModalOpen(true)}
+        savedTopicIds={savedTopicIds}
+        onToggleSaveTopic={handleToggleSaveTopic}
+        onAskTutorAboutTopic={(topicObj, query) => {
+          setActiveTopic(topicObj);
+          handleAskTutorAboutTerm(query || `Can you give me an overview and study plan for ${topicObj.title}?`);
+        }}
       />
 
       {/* Minimal Distraction-Free Footer */}

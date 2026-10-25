@@ -14,6 +14,8 @@ import {
   Tag,
   Clock,
   Award,
+  Bookmark,
+  BookMarked,
 } from 'lucide-react';
 import { Topic, UserProfile, ReadingLevel } from '../types';
 
@@ -31,6 +33,10 @@ interface TopicSelectorBarProps {
   onAwardXp: (amount: number, reason: string) => void;
   topicMasteryMap: Record<string, { completed?: boolean; bestScorePercentage?: number }>;
   onAiTopicDiscovered: (topic: Topic) => void;
+  isSaved?: boolean;
+  onToggleSave?: () => void;
+  onOpenReadingList?: () => void;
+  savedCount?: number;
 }
 
 export const TopicSelectorBar: React.FC<TopicSelectorBarProps> = ({
@@ -47,6 +53,10 @@ export const TopicSelectorBar: React.FC<TopicSelectorBarProps> = ({
   onAwardXp,
   topicMasteryMap,
   onAiTopicDiscovered,
+  isSaved = false,
+  onToggleSave,
+  onOpenReadingList,
+  savedCount = 0,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -290,6 +300,41 @@ export const TopicSelectorBar: React.FC<TopicSelectorBarProps> = ({
             <Tag className="w-3 h-3 text-slate-400" />
             <span>{activeTopic.category}</span>
           </span>
+
+          {/* Save for Later / Bookmark Toggle */}
+          {onToggleSave && (
+            <button
+              type="button"
+              onClick={onToggleSave}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-2xs border ${
+                isSaved
+                  ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-700 shadow-amber-500/10'
+                  : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/80 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+              }`}
+              title={isSaved ? 'Topic is saved in your Reading List · Click to remove' : 'Save this topic for later in your Reading List'}
+            >
+              <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-amber-500 text-amber-500' : 'text-slate-500 dark:text-slate-400'}`} />
+              <span className="hidden sm:inline">{isSaved ? 'Saved' : 'Save for Later'}</span>
+            </button>
+          )}
+
+          {/* Reading List Drawer Shortcut */}
+          {onOpenReadingList && (
+            <button
+              type="button"
+              onClick={onOpenReadingList}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200 dark:border-slate-700 text-xs font-semibold transition-all shadow-2xs"
+              title="Open Reading List drawer"
+            >
+              <BookMarked className="w-3.5 h-3.5 text-indigo-500" />
+              <span className="hidden md:inline">Reading List</span>
+              {savedCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
+                  {savedCount}
+                </span>
+              )}
+            </button>
+          )}
         </div>
 
         {/* Center / Right: Intelligent Topic Search Field */}

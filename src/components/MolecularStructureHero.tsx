@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   HelpCircle,
   FlaskConical,
+  Bookmark,
 } from 'lucide-react';
 import * as $3Dmol from '3dmol';
 import { Topic, ChemicalCompoundInfo, MolecularLabel, Character, CellularCompartmentInfo } from '../types';
@@ -28,6 +29,8 @@ interface MolecularStructureHeroProps {
   darkMode: boolean;
   activeCharacter?: Character;
   onAskQuestionAboutGroup?: (groupName: string) => void;
+  isSaved?: boolean;
+  onToggleSave?: () => void;
 }
 
 export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
@@ -35,6 +38,8 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
   darkMode,
   activeCharacter,
   onAskQuestionAboutGroup,
+  isSaved = false,
+  onToggleSave,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<any>(null);
@@ -458,7 +463,13 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
               </span>
               {isCellular ? (
                 <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-mono font-bold text-xs border border-emerald-200 dark:border-emerald-800">
-                  {topic.structureType === 'neuron' ? 'Cellular / Nerve Model' : topic.structureType === 'mitochondria' ? 'Organelle / ATP Engine' : 'Tissue Model'}
+                  {topic.id === 'cellular-structure' || topic.structureType === 'cell_organelle'
+                    ? 'Eukaryotic Cell Structure'
+                    : topic.structureType === 'neuron'
+                    ? 'Cellular / Nerve Model'
+                    : topic.structureType === 'mitochondria'
+                    ? 'Organelle / ATP Engine'
+                    : 'Tissue Model'}
                 </span>
               ) : topic.chemicalFormula ? (
                 <span className="px-2.5 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-200 font-mono font-bold text-xs border border-indigo-200 dark:border-indigo-800">
@@ -479,6 +490,23 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
 
         {/* 2D vs 3D Mode & View Controls */}
         <div className="flex items-center gap-2">
+          {/* Save for Later Bookmark Button */}
+          {onToggleSave && (
+            <button
+              type="button"
+              onClick={onToggleSave}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+                isSaved
+                  ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-700 shadow-2xs'
+                  : 'bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+              }`}
+              title={isSaved ? 'Topic is saved in your Reading List · Click to remove' : 'Bookmark this topic for later study'}
+            >
+              <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-amber-500 text-amber-500' : 'text-slate-400'}`} />
+              <span className="hidden sm:inline">{isSaved ? 'Saved' : 'Save for Later'}</span>
+            </button>
+          )}
+
           {/* 2D / 3D Mode Toggle */}
           <div className="inline-flex rounded-xl bg-slate-200/70 dark:bg-slate-800 p-0.5 text-xs">
             <button
@@ -907,7 +935,9 @@ export const MolecularStructureHero: React.FC<MolecularStructureHeroProps> = ({
               <span>{activeCharacter.name} explains this structure:</span>
             </div>
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-              {topic.id === 'neuron-cell'
+              {topic.id === 'cellular-structure'
+                ? "Look inside this cutaway animal cell! Notice the central purple command nucleus safeguarding DNA, surrounded by pink rough ER ribbons weaving proteins and golden Golgi cisternae packaging cargo. The orange mitochondria generate ATP power while green lysosomes recycle cellular waste—a true microscopic metropolis!"
+                : topic.id === 'neuron-cell'
                 ? "Look at the glowing pulse traveling down the axon! The fatty green myelin sheaths insulate the wire so the electrical spark jumps between the pink Nodes of Ranvier at 120 meters per second. That is why your hand moves the instant you decide to catch a ball!"
                 : topic.id === 'mitochondria-organelle'
                 ? "Notice those deep red accordion folds inside! Evolution shaped those cristae to create massive surface area for thousands of green F0F1 ATP synthases. They spin like tiny water turbines at 6,000 RPM as protons rush through, charging up all your daily energy!"

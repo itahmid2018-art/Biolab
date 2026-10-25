@@ -175,12 +175,19 @@ export interface ActivityEvent {
   timestamp: number;
 }
 
+export interface SavedTopicItem {
+  topicId: string;
+  savedAt: number;
+  notes?: string;
+}
+
 export interface StudentProgress {
   totalXp: number;
   level: number;
   levelTitle: string;
   streakDays: number;
   completedTopicIds: string[];
+  savedTopicIds?: string[];
   topicMastery: Record<string, TopicMastery>;
   unlockedBadgeIds: string[];
   recentActivities: ActivityEvent[];

@@ -912,6 +912,161 @@ The secret is the specialized architecture of the Multipolar Neuron. Unlike roun
       },
     ],
   },
+  {
+    id: 'cellular-structure',
+    title: 'The Microscopic Metropolis: Animal Cellular Structure',
+    subtitle: 'The bustling eukaryotic city of genetic libraries, protein factories, and energy plants',
+    category: 'Cell Biology & Cytology',
+    difficulty: 'Core Science',
+    readTime: '5 min read',
+    hasMolecularStructure: true,
+    structureType: 'cell_organelle',
+    provenance: {
+      source: 'Human Protein Atlas & Cryo-Electron Microscopy',
+      type: 'Experimentally determined',
+      externalUrl: 'https://www.proteinatlas.org/',
+      experimentalMethod: 'Cryo-Electron Tomography (Cryo-ET) & Confocal Immunofluorescence',
+    },
+    cellularMetrics: {
+      diameter: '10 - 30 µm',
+      organelles: '> 12 types',
+      volume: '~4,000 µm³',
+      proteinCount: '~1 billion',
+    },
+    summary:
+      'Every human tissue, muscle, and organ is built from eukaryotic cells—microscopic metropolises enclosed within a dynamic plasma membrane. At the center lies the double-membraned nucleus safeguarding 3 billion genetic letters. Surrounding it are specialized organelle districts: rough and smooth endoplasmic reticulum weaving proteins and lipids, Golgi apparatus packaging molecular cargo, mitochondria generating ATP bioenergy, lysosomes recycling waste, and centrosome highways guiding intracellular traffic!',
+    fullContent: `If you could shrink down to one-millionth of your size and step inside an animal cell, you would find yourself inside the most technologically advanced, bustling city on Earth!
+
+Unlike simpler single-celled bacteria (prokaryotes), eukaryotic animal cells divide their tasks into specialized membrane-enclosed rooms called organelles:
+
+1. The Plasma Membrane: The dynamic city wall! A flexible fluid-mosaic bilayer composed of amphipathic phospholipids, cholesterol buffers, and embedded transmembrane proteins that regulate the influx and efflux of ions, sugars, and signals.
+2. The Nucleus & Nuclear Pores: The central command vault! Sheltered behind a double-membraned nuclear envelope with ~3,000 octagonal nuclear pore complexes, it preserves your genomic DNA wrapped around histone spools into euchromatin and heterochromatin.
+3. The Nucleolus: The intense dark pearl inside the nucleus where ribosomal RNA (rRNA) is furiously transcribed and assembled into the large (60S) and small (40S) subunits of cellular protein factories.
+4. Endoplasmic Reticulum (ER):
+   - Rough ER: Studded with millions of 80S ribosomes that inject newly synthesized polypeptide chains directly into the cisternal lumen for folding and initial N-linked glycosylation.
+   - Smooth ER: Lacks ribosomes; synthesizes phospholipids, cholesterol, and steroid hormones, while storing intracellular calcium (Ca2+) and detoxifying lipid-soluble drugs.
+5. The Golgi Apparatus: The central postal and logistics hub! Stacked curved cisternae (cis-Golgi receiving face to trans-Golgi shipping face) that sequentially modify oligosaccharide sidechains, sort proteins, and package them into coated transport vesicles.
+6. Mitochondria (The Power Generators): Double-membraned bioenergetic engines whose folded inner cristae sheets drive rotary ATP synthases at 6,000 RPM, providing energy for all active cellular work.
+7. Lysosomes & Peroxisomes: The recycling and decontamination fleet! Acidic vesicular chambers (pH 4.5-5.0) packed with over 50 hydrolytic enzymes that digest engulfed invaders, cellular debris, and damaged organelles (autophagy).
+8. Centrosome & Microtubule Highways: Composed of a pair of orthogonal cylindrical centrioles that nucleate the radial microtubule network—the cellular railway upon which motor proteins (kinesin and dynein) ferry transport vesicles across the cytosol!`,
+    funFact:
+      'A single human animal cell contains roughly 1 to 2 billion protein molecules, and its molecular motor proteins take millions of coordinated steps per second along microtubule highways!',
+    keyQuestions: [
+      'How does the selective permeability of the plasma membrane maintain cellular homeostasis?',
+      'How do proteins travel from the Rough ER through the Golgi apparatus to their final destinations?',
+      'Why is compartmentalization in membrane-bound organelles an evolutionary advantage for eukaryotic cells?',
+    ],
+    vocabulary: [
+      {
+        term: 'Organelle',
+        definition: 'A specialized subcellular structure within a cell that performs a specific metabolic or structural task.',
+      },
+      {
+        term: 'Eukaryote',
+        definition: 'An organism whose cells contain a complex membrane-bound nucleus and specialized cytoplasmic organelles.',
+      },
+      {
+        term: 'Fluid Mosaic Model',
+        definition: 'The structural model of the cell membrane describing a flexible lipid bilayer embedded with moving proteins.',
+      },
+      {
+        term: 'Autophagy',
+        definition: 'The cellular recycling process where lysosomes digest and repurpose worn-out organelles and proteins.',
+      },
+    ],
+    cellularCompartments: [
+      {
+        id: 'plasma-membrane',
+        name: 'Plasma Membrane (Lipid Bilayer)',
+        tag: 'Selective Boundary',
+        color: '#38bdf8',
+        location: 'Perimeter Envelope',
+        function: 'Phospholipid bilayer with embedded cholesterol, ion channels, and receptor proteins; regulates entry/exit and cell signaling.',
+        dimensions: '7-10 nm thickness',
+        keyMolecules: ['Phospholipids', 'Cholesterol', 'Glycoproteins', 'Aquaporins'],
+      },
+      {
+        id: 'nucleus',
+        name: 'Nucleus & Nuclear Envelope',
+        tag: 'Command Vault',
+        color: '#a855f7',
+        location: 'Center of Cell',
+        function: 'Double-membrane chamber with nuclear pores safeguarding 3 billion base pairs of genomic DNA organized in chromatin.',
+        dimensions: '5-8 µm diameter',
+        keyMolecules: ['Genomic DNA', 'Histone Octamers', 'Nuclear Lamins', 'RNA Pol II'],
+      },
+      {
+        id: 'nucleolus',
+        name: 'Nucleolus',
+        tag: 'Ribosome Forge',
+        color: '#f43f5e',
+        location: 'Inside Nucleus',
+        function: 'Dense non-membrane region where ribosomal RNA (rRNA) genes are transcribed and assembled into 40S/60S ribosome subunits.',
+        dimensions: '1-2 µm diameter',
+        keyMolecules: ['rRNA', 'Fibrillarin', 'Nucleolin', 'Ribosomal Proteins'],
+      },
+      {
+        id: 'endoplasmic-reticulum',
+        name: 'Endoplasmic Reticulum (Rough & Smooth)',
+        tag: 'Manufacturing Network',
+        color: '#ec4899',
+        location: 'Perinuclear Mesh',
+        function: 'Rough ER synthesizes membrane & secretable proteins; smooth ER manufactures lipids, steroids, and detoxifies chemicals.',
+        dimensions: 'Extensive convoluted cisternae',
+        keyMolecules: ['80S Ribosomes', 'SRP Receptors', 'Chaperones', 'Lipid Synthetases'],
+      },
+      {
+        id: 'golgi-apparatus',
+        name: 'Golgi Apparatus',
+        tag: 'Packaging & Logistics',
+        color: '#f59e0b',
+        location: 'Near ER & Nucleus',
+        function: 'Stacked membranous cisternae that tag, glycosylate, sort, and dispatch proteins into secretory and lysosomal vesicles.',
+        dimensions: '4-6 stacked cisternae (1 µm)',
+        keyMolecules: ['Glycosyltransferases', 'SNAREs', 'Clathrin', 'COPI/COPII'],
+      },
+      {
+        id: 'mitochondria',
+        name: 'Mitochondria (Powerhouses)',
+        tag: 'ATP Bioenergetics',
+        color: '#f97316',
+        location: 'Scattered in Cytoplasm',
+        function: 'Double-membrane organelles using oxygen and the Krebs cycle to produce 90% of cellular ATP via oxidative phosphorylation.',
+        dimensions: '0.5-2.0 µm length',
+        keyMolecules: ['Complexes I-IV', 'F0F1 ATP Synthase', 'mtDNA', 'Cardiolipin'],
+      },
+      {
+        id: 'lysosomes',
+        name: 'Lysosomes & Peroxisomes',
+        tag: 'Recycling & Defense',
+        color: '#10b981',
+        location: 'Cytosol Vesicles',
+        function: 'Acidic (pH ~4.8) spheres containing acid hydrolases that degrade cellular waste, foreign bacteria, and old organelles.',
+        dimensions: '0.2-1.0 µm diameter',
+        keyMolecules: ['Acid Hydrolases', 'V-ATPase H+ Pump', 'Catalase'],
+      },
+      {
+        id: 'centrosome',
+        name: 'Centrosome & Microtubules',
+        tag: 'Structural Transit',
+        color: '#6366f1',
+        location: 'Near Nucleus',
+        function: 'Pair of orthogonal centrioles organizing the radial microtubule network for mitosis and kinesin/dynein motor transport.',
+        dimensions: '0.2 × 0.4 µm centrioles',
+        keyMolecules: ['α/β-Tubulin', 'γ-TuRC', 'Centrin', 'Pericentrin'],
+      },
+      {
+        id: 'cytosol',
+        name: 'Cytosol & Streaming Vesicles',
+        tag: 'Dynamic Matrix',
+        color: '#06b6d4',
+        location: 'Entire Cell Interior',
+        function: 'Aqueous crowded fluid containing electrolytes, metabolic enzymes, and streaming transport vesicles ferried by motor proteins.',
+        dimensions: 'Fills ~4,000 µm³ volume',
+        keyMolecules: ['Actin Filaments', 'Kinesin Motors', 'Dynein', 'Metabolic Enzymes'],
+      },
+    ],
+  },
 ];
 
 // Helper to search and filter topics for user search
@@ -919,19 +1074,51 @@ export const searchCuratedTopics = (query: string): Topic | null => {
   const q = query.trim().toLowerCase();
   if (!q) return null;
 
-  // Direct keyword matching for cellular, organelle, and tissue models
-  if (q.includes('neuron') || q.includes('nerve') || q.includes('axon') || q.includes('action potential') || q.includes('synapse') || q.includes('brain cell')) {
+  // 1. Direct keyword matching for cellular structure and eukaryotic cell
+  if (
+    q.includes('cellular structure') ||
+    q.includes('cell structure') ||
+    q.includes('animal cell') ||
+    q.includes('eukaryot') ||
+    q.includes('cytology') ||
+    q === 'cell' ||
+    q === 'cells' ||
+    q.includes('whole cell') ||
+    q.includes('diagram of the cellular structure') ||
+    q.includes('cellular diagram') ||
+    q.includes('cell diagram') ||
+    (q.includes('cell') && !q.includes('neuron') && !q.includes('brain') && !q.includes('mitochond'))
+  ) {
+    return CURATED_TOPICS.find((t) => t.id === 'cellular-structure') || null;
+  }
+
+  // 2. Direct keyword matching for neuron and nervous system
+  if (
+    q.includes('neuron') ||
+    q.includes('nerve') ||
+    q.includes('axon') ||
+    q.includes('action potential') ||
+    q.includes('synapse') ||
+    q.includes('brain cell')
+  ) {
     return CURATED_TOPICS.find((t) => t.id === 'neuron-cell') || null;
   }
-  if (q.includes('mitochond') || q.includes('powerhouse') || q.includes('atp') || q.includes('cristae') || q.includes('proton') || q.includes('bioenergetics')) {
+
+  // 3. Direct keyword matching for mitochondria
+  if (
+    q.includes('mitochond') ||
+    q.includes('powerhouse') ||
+    q.includes('atp') ||
+    q.includes('cristae') ||
+    q.includes('proton') ||
+    q.includes('bioenergetics')
+  ) {
     return CURATED_TOPICS.find((t) => t.id === 'mitochondria-organelle') || null;
   }
-  if (q.includes('cell') || q.includes('organelle') || q.includes('tissue')) {
-    // If generic "cell" or "organelle", return neuron or mitochondria
-    if (q.includes('energy') || q.includes('atp') || q.includes('organelle')) {
-      return CURATED_TOPICS.find((t) => t.id === 'mitochondria-organelle') || null;
-    }
-    return CURATED_TOPICS.find((t) => t.id === 'neuron-cell') || null;
+
+  // 4. Organelle / tissue fallback
+  if (q.includes('organelle') || q.includes('tissue')) {
+    return CURATED_TOPICS.find((t) => t.id === 'cellular-structure') || null;
   }
 
   // Direct keyword matching for the user's specific examples

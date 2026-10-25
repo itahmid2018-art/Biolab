@@ -29,6 +29,7 @@ export const CellOrganelle2DViewer: React.FC<CellOrganelle2DViewerProps> = ({
 
   const isNeuron = topic.id === 'neuron-cell' || topic.structureType === 'neuron';
   const isMitochondria = topic.id === 'mitochondria-organelle' || topic.structureType === 'mitochondria';
+  const isCellularStructure = !isNeuron && !isMitochondria;
 
   // Hotspot coordinates & metadata
   const neuronHotspots: Array<{ id: string; x: number; y: number; label: string }> = [
@@ -50,7 +51,23 @@ export const CellOrganelle2DViewer: React.FC<CellOrganelle2DViewerProps> = ({
     { id: 'mtdna', x: 270, y: 310, label: 'Circular mtDNA' },
   ];
 
-  const currentHotspots = isNeuron ? neuronHotspots : mitochondriaHotspots;
+  const cellStructureHotspots: Array<{ id: string; x: number; y: number; label: string }> = [
+    { id: 'plasma-membrane', x: 740, y: 140, label: 'Plasma Membrane' },
+    { id: 'nucleus', x: 390, y: 220, label: 'Nucleus & DNA' },
+    { id: 'nucleolus', x: 375, y: 195, label: 'Nucleolus (rRNA Forge)' },
+    { id: 'endoplasmic-reticulum', x: 250, y: 230, label: 'Rough & Smooth ER' },
+    { id: 'golgi-apparatus', x: 575, y: 240, label: 'Golgi Apparatus' },
+    { id: 'mitochondria', x: 250, y: 130, label: 'Mitochondria (Powerhouse)' },
+    { id: 'lysosomes', x: 535, y: 135, label: 'Lysosomes / Peroxisomes' },
+    { id: 'centrosome', x: 330, y: 320, label: 'Centrosome & Microtubules' },
+    { id: 'cytosol', x: 640, y: 330, label: 'Cytosol & Vesicles' },
+  ];
+
+  const currentHotspots = isNeuron
+    ? neuronHotspots
+    : isMitochondria
+    ? mitochondriaHotspots
+    : cellStructureHotspots;
 
   const handleHotspotClick = (id: string) => {
     const comp = topic.cellularCompartments?.find((c) => c.id === id);
@@ -69,7 +86,11 @@ export const CellOrganelle2DViewer: React.FC<CellOrganelle2DViewerProps> = ({
           </div>
           <div>
             <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-              {isNeuron ? '2D Anatomical Cross-Section: Multipolar Motor Neuron' : '2D Ultrastructural Cross-Section: Mitochondrion'}
+              {isNeuron
+                ? '2D Anatomical Cross-Section: Multipolar Motor Neuron'
+                : isMitochondria
+                ? '2D Ultrastructural Cross-Section: Mitochondrion'
+                : '2D Cytological Cross-Section: Animal Eukaryotic Cell'}
             </h3>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
               Interactive histological schematic with labeled micro-compartments and bioenergetics
@@ -222,7 +243,7 @@ export const CellOrganelle2DViewer: React.FC<CellOrganelle2DViewerProps> = ({
               Action Potential Direction (120 m/s Saltatory Conduction)
             </text>
           </svg>
-        ) : (
+        ) : isMitochondria ? (
           // ======================= 2D MITOCHONDRION SVG =======================
           <svg viewBox="0 0 840 440" className="w-full h-full filter drop-shadow-xs">
             <defs>
@@ -325,6 +346,132 @@ export const CellOrganelle2DViewer: React.FC<CellOrganelle2DViewerProps> = ({
             <text x="210" y="112" fill="#38bdf8" fontSize="11" fontWeight="bold">
               High H+ Proton Gradient (ΔpH 1.4)
             </text>
+          </svg>
+        ) : (
+          // ======================= 2D EUKARYOTIC ANIMAL CELL SVG =======================
+          <svg viewBox="0 0 840 440" className="w-full h-full filter drop-shadow-xs">
+            <defs>
+              <linearGradient id="cellBilayer" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#38bdf8" />
+                <stop offset="100%" stopColor="#0284c7" />
+              </linearGradient>
+              <linearGradient id="cytosolGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#f0f9ff" stopOpacity={darkMode ? '0.12' : '0.85'} />
+                <stop offset="100%" stopColor="#e0f2fe" stopOpacity={darkMode ? '0.06' : '0.65'} />
+              </linearGradient>
+              <linearGradient id="nucleusGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#a855f7" />
+                <stop offset="100%" stopColor="#6b21a8" />
+              </linearGradient>
+              <linearGradient id="nucleolusGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#fb7185" />
+                <stop offset="100%" stopColor="#e11d48" />
+              </linearGradient>
+            </defs>
+
+            {/* Background Grid Pattern */}
+            <pattern id="cGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke={darkMode ? '#1e293b' : '#f1f5f9'} strokeWidth="1" />
+            </pattern>
+            <rect width="840" height="440" fill="url(#cGrid)" />
+
+            {/* Plasma Membrane Bilayer Outline */}
+            <ellipse cx="420" cy="220" rx="360" ry="190" fill="url(#cytosolGrad)" stroke="url(#cellBilayer)" strokeWidth="6" />
+            <ellipse cx="420" cy="220" rx="352" ry="182" fill="none" stroke="#7dd3fc" strokeWidth="2" strokeDasharray="6 3" />
+
+            {/* Embedded Membrane Transport Proteins on Perimeter */}
+            <rect x="730" y="128" width="16" height="24" rx="4" fill="#10b981" stroke="#059669" strokeWidth="1.5" />
+            <rect x="680" y="72" width="18" height="20" rx="4" fill="#a855f7" stroke="#7e22ce" strokeWidth="1.5" />
+            <rect x="130" y="270" width="18" height="22" rx="4" fill="#f59e0b" stroke="#d97706" strokeWidth="1.5" />
+
+            {/* Cytoskeleton Microtubule Highway Tracks */}
+            <g stroke="#818cf8" strokeWidth="1.5" strokeDasharray="5 3" opacity="0.6" fill="none">
+              <path d="M 330 310 C 220 280 180 200 150 140" />
+              <path d="M 330 310 C 380 340 500 360 620 340" />
+              <path d="M 330 310 C 440 270 550 200 680 130" />
+            </g>
+
+            {/* Rough Endoplasmic Reticulum (RER Folded Cisternae) */}
+            <g fill="none" stroke="#ec4899" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" opacity="0.9">
+              <path d="M 300 170 C 240 160 210 190 220 230 C 230 270 250 285 295 290" />
+              <path d="M 285 145 C 205 135 175 180 185 235 C 195 285 225 315 285 320" />
+            </g>
+
+            {/* Studded 80S Ribosomes on RER */}
+            {[
+              [220, 185], [215, 215], [220, 245], [240, 275],
+              [185, 175], [180, 205], [185, 245], [200, 280], [230, 305],
+            ].map(([bx, by], idx) => (
+              <circle key={idx} cx={bx} cy={by} r="2.8" fill="#facc15" stroke="#ca8a04" strokeWidth="0.8" />
+            ))}
+
+            {/* Smooth ER (Tubular Mesh) */}
+            <g fill="none" stroke="#f472b6" strokeWidth="6" strokeLinecap="round">
+              <path d="M 280 325 C 260 360 220 370 190 350" />
+              <path d="M 260 340 C 240 375 200 380 170 365" />
+            </g>
+
+            {/* Nucleus & Double-membrane Envelope with Pores */}
+            <circle cx="390" cy="220" r="95" fill="url(#nucleusGrad)" stroke="#581c87" strokeWidth="4" />
+            {/* Nuclear Pore Dimples */}
+            <circle cx="390" cy="220" r="95" fill="none" stroke="#c084fc" strokeWidth="3" strokeDasharray="14 14" />
+            {/* Chromatin Threads */}
+            <path d="M 330 200 Q 360 170 390 200 T 450 200" fill="none" stroke="#c084fc" strokeWidth="2.5" opacity="0.65" />
+            <path d="M 340 240 Q 380 270 420 235" fill="none" stroke="#c084fc" strokeWidth="2.5" opacity="0.65" />
+
+            {/* Nucleolus Core (rRNA Assembly Hub) */}
+            <circle cx="375" cy="195" r="32" fill="url(#nucleolusGrad)" stroke="#9f1239" strokeWidth="2.5" />
+            <text x="375" y="199" fill="#ffffff" fontSize="10" fontFamily="sans-serif" fontWeight="bold" textAnchor="middle">
+              rRNA Hub
+            </text>
+
+            {/* Golgi Apparatus (Curved Stacked Cisternae) */}
+            <g fill="none" stroke="#f59e0b" strokeWidth="8" strokeLinecap="round">
+              <path d="M 545 185 Q 575 215 565 265" />
+              <path d="M 560 180 Q 595 215 580 275" />
+              <path d="M 575 175 Q 615 215 595 285" />
+            </g>
+            {/* Budding Golgi Secretory Vesicles */}
+            <circle cx="615" cy="210" r="7" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" />
+            <circle cx="605" cy="245" r="5.5" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" />
+            <circle cx="620" cy="270" r="7.5" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" />
+
+            {/* Mitochondrion #1 (Top Left) */}
+            <g transform="translate(250, 130) rotate(-20)">
+              <rect x="-42" y="-22" width="84" height="44" rx="22" fill="#f97316" stroke="#c2410c" strokeWidth="2.5" />
+              <rect x="-36" y="-18" width="72" height="36" rx="18" fill="#ffedd5" opacity="0.5" />
+              {/* Cristae Folds */}
+              <path d="M -24 -18 Q -20 0 -16 -18 M -8 18 Q -4 0 0 18 M 12 -18 Q 16 0 20 -18" fill="none" stroke="#ef4444" strokeWidth="3.5" strokeLinecap="round" />
+            </g>
+
+            {/* Mitochondrion #2 (Bottom Center-Right) */}
+            <g transform="translate(560, 330) rotate(15)">
+              <rect x="-40" y="-20" width="80" height="40" rx="20" fill="#f97316" stroke="#c2410c" strokeWidth="2.5" />
+              <rect x="-34" y="-16" width="68" height="32" rx="16" fill="#ffedd5" opacity="0.5" />
+              <path d="M -20 -16 Q -16 0 -12 -16 M -4 16 Q 0 0 4 16 M 14 -16 Q 18 0 22 -16" fill="none" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" />
+            </g>
+
+            {/* Lysosomes & Peroxisomes (Spherical Digestive Chambers) */}
+            <circle cx="535" cy="135" r="18" fill="#10b981" stroke="#059669" strokeWidth="2.5" />
+            <circle cx="532" cy="132" r="4" fill="#a7f3d0" />
+            <circle cx="210" cy="305" r="16" fill="#10b981" stroke="#059669" strokeWidth="2.5" />
+            <circle cx="475" cy="340" r="15" fill="#10b981" stroke="#059669" strokeWidth="2.5" />
+
+            {/* Centrosome (Pair of Orthogonal Centrioles) */}
+            <g transform="translate(330, 318)">
+              <rect x="-14" y="-7" width="14" height="22" rx="3" fill="#6366f1" stroke="#4338ca" strokeWidth="1.5" />
+              <rect x="-4" y="-12" width="22" height="14" rx="3" fill="#6366f1" stroke="#4338ca" strokeWidth="1.5" />
+              {/* Aster rays */}
+              <line x1="-18" y1="-18" x2="18" y2="18" stroke="#818cf8" strokeWidth="1" strokeDasharray="3 2" />
+              <line x1="18" y1="-18" x2="-18" y2="18" stroke="#818cf8" strokeWidth="1" strokeDasharray="3 2" />
+            </g>
+
+            {/* Streaming Transport Vesicles in Cytosol */}
+            {[
+              [640, 160], [665, 230], [640, 320], [450, 360], [330, 120], [480, 100], [180, 120]
+            ].map(([vx, vy], i) => (
+              <circle key={i} cx={vx} cy={vy} r="4" fill="#06b6d4" stroke="#0891b2" strokeWidth="1" />
+            ))}
           </svg>
         )}
 

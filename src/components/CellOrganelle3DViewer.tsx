@@ -47,6 +47,8 @@ export const CellOrganelle3DViewer: React.FC<CellOrganelle3DViewerProps> = ({
   const atpRotorsRef = useRef<THREE.Group[]>([]);
   const protonParticlesRef = useRef<THREE.Points | null>(null);
   const sarcomereHeadsRef = useRef<THREE.Group[]>([]);
+  const cytosolParticlesRef = useRef<THREE.Points | null>(null);
+  const cellMitoMeshesRef = useRef<THREE.Mesh[]>([]);
 
   // Interactive UI state
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
@@ -66,6 +68,10 @@ export const CellOrganelle3DViewer: React.FC<CellOrganelle3DViewerProps> = ({
   const isNeuron = topic.id === 'neuron-cell' || topic.structureType === 'neuron';
   const isMitochondria = topic.id === 'mitochondria-organelle' || topic.structureType === 'mitochondria';
   const isSarcomere = topic.id === 'sarcomere-tissue' || topic.structureType === 'tissue';
+  const isCellularStructure =
+    topic.id === 'cellular-structure' ||
+    topic.structureType === 'cell_organelle' ||
+    (!isNeuron && !isMitochondria && !isSarcomere);
 
   // Find currently selected compartment object
   const activeCompartment = topic.cellularCompartments?.find((c) => c.id === selectedPartId) || null;
@@ -555,6 +561,286 @@ export const CellOrganelle3DViewer: React.FC<CellOrganelle3DViewerProps> = ({
       const protons = new THREE.Points(protonGeo, protonMat);
       scene.add(protons);
       protonParticlesRef.current = protons;
+    } else if (isCellularStructure) {
+      // -------------------------------------------------------------
+      // EUKARYOTIC / ANIMAL CELLULAR STRUCTURE:
+      // Plasma Membrane (Cutaway), Nucleus, Nucleolus, Rough & Smooth ER,
+      // Golgi Apparatus, Mitochondria, Lysosomes, Centrosome & Cytosol
+      // -------------------------------------------------------------
+      cellMitoMeshesRef.current = [];
+
+      // 1. Plasma Membrane (Translucent 3/4 Cutaway Spherical Shell)
+      // Open 90° wedge (0 to 1.55 * PI) reveals the inner cellular metropolis
+      const membraneGeo = new THREE.SphereGeometry(6.6, 48, 48, 0, Math.PI * 1.55, 0, Math.PI);
+      const membraneMat = new THREE.MeshPhysicalMaterial({
+        color: 0x38bdf8,
+        roughness: 0.25,
+        metalness: 0.1,
+        clearcoat: 0.7,
+        transparent: true,
+        opacity: 0.8,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      });
+      const membraneMesh = new THREE.Mesh(membraneGeo, membraneMat);
+      membraneMesh.name = 'plasma-membrane';
+      outerGroup.add(membraneMesh);
+      interactivePartsMapRef.current.set(membraneMesh, 'plasma-membrane');
+
+      // Surface Glycoprotein and Ion Channel Receptors on outer membrane
+      for (let s = 0; s < 22; s++) {
+        const theta = 0.2 + (s / 22) * (Math.PI * 1.4);
+        const phi = 0.3 + (Math.random() * 0.7) * Math.PI;
+        const rad = 6.65;
+        const receptorGeo = new THREE.CylinderGeometry(0.12, 0.08, 0.6, 8);
+        const receptorMat = new THREE.MeshStandardMaterial({
+          color: s % 2 === 0 ? 0x10b981 : 0xa855f7,
+          roughness: 0.4,
+        });
+        const receptor = new THREE.Mesh(receptorGeo, receptorMat);
+        receptor.position.set(
+          rad * Math.sin(phi) * Math.cos(theta),
+          rad * Math.cos(phi),
+          rad * Math.sin(phi) * Math.sin(theta)
+        );
+        receptor.lookAt(0, 0, 0);
+        outerGroup.add(receptor);
+      }
+
+      // 2. Nucleus & Nuclear Envelope (Cutaway Sphere at center)
+      const nucGeo = new THREE.SphereGeometry(2.35, 36, 36, 0, Math.PI * 1.6, 0, Math.PI);
+      const nucMat = new THREE.MeshPhysicalMaterial({
+        color: 0x8b5cf6,
+        roughness: 0.35,
+        metalness: 0.15,
+        clearcoat: 0.4,
+        side: THREE.DoubleSide,
+      });
+      const nucMesh = new THREE.Mesh(nucGeo, nucMat);
+      nucMesh.name = 'nucleus';
+      innerGroup.add(nucMesh);
+      interactivePartsMapRef.current.set(nucMesh, 'nucleus');
+
+      // Studded Nuclear Pore Complexes (Toruses on nuclear envelope)
+      for (let p = 0; p < 18; p++) {
+        const poreGeo = new THREE.TorusGeometry(0.15, 0.05, 8, 16);
+        const poreMat = new THREE.MeshStandardMaterial({ color: 0xc084fc, roughness: 0.3 });
+        const pore = new THREE.Mesh(poreGeo, poreMat);
+        const pTheta = 0.15 + (p / 18) * (Math.PI * 1.45);
+        const pPhi = 0.3 + (Math.random() * 0.6) * Math.PI;
+        pore.position.set(
+          2.36 * Math.sin(pPhi) * Math.cos(pTheta),
+          2.36 * Math.cos(pPhi),
+          2.36 * Math.sin(pPhi) * Math.sin(pTheta)
+        );
+        pore.lookAt(0, 0, 0);
+        innerGroup.add(pore);
+      }
+
+      // 3. Nucleolus (Dense Inner rRNA Forge)
+      const nucleolusGeo = new THREE.SphereGeometry(0.9, 24, 24);
+      const nucleolusMat = new THREE.MeshPhysicalMaterial({
+        color: 0xf43f5e,
+        emissive: 0xbe123c,
+        emissiveIntensity: 0.5,
+        roughness: 0.25,
+      });
+      const nucleolus = new THREE.Mesh(nucleolusGeo, nucleolusMat);
+      nucleolus.position.set(0.2, 0.2, 0.2);
+      nucleolus.name = 'nucleolus';
+      innerGroup.add(nucleolus);
+      interactivePartsMapRef.current.set(nucleolus, 'nucleolus');
+
+      // 4. Endoplasmic Reticulum (Concentric Undulating Ribbon Folds around Nucleus)
+      for (let r = 0; r < 3; r++) {
+        const erRadius = 2.9 + r * 0.55;
+        const erGeo = new THREE.TorusGeometry(erRadius, 0.22, 12, 40, Math.PI * 1.35);
+        erGeo.rotateX(Math.PI / 2 + r * 0.22);
+        erGeo.rotateZ(r * 0.4);
+        const erMat = new THREE.MeshPhysicalMaterial({
+          color: 0xec4899,
+          roughness: 0.35,
+          metalness: 0.1,
+          clearcoat: 0.35,
+        });
+        const erMesh = new THREE.Mesh(erGeo, erMat);
+        erMesh.position.set(0, -0.25 + r * 0.3, 0);
+        erMesh.name = 'endoplasmic-reticulum';
+        innerGroup.add(erMesh);
+        interactivePartsMapRef.current.set(erMesh, 'endoplasmic-reticulum');
+
+        // Studded 80S Ribosome Granules (Rough ER)
+        for (let b = 0; b < 14; b++) {
+          const riboGeo = new THREE.SphereGeometry(0.065, 6, 6);
+          const riboMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+          const ribo = new THREE.Mesh(riboGeo, riboMat);
+          const angle = (b / 14) * Math.PI * 1.35;
+          ribo.position.set(
+            Math.cos(angle) * erRadius + (Math.random() - 0.5) * 0.15,
+            -0.25 + r * 0.3 + (Math.random() - 0.5) * 0.2,
+            Math.sin(angle) * erRadius + (Math.random() - 0.5) * 0.15
+          );
+          innerGroup.add(ribo);
+        }
+      }
+
+      // 5. Golgi Apparatus (Stacked Curved Cisternae with Budding Vesicles)
+      const golgiGroup = new THREE.Group();
+      golgiGroup.position.set(3.3, 0.7, -1.1);
+      for (let g = 0; g < 4; g++) {
+        const cisternGeo = new THREE.TorusGeometry(1.4 - g * 0.12, 0.18, 10, 28, Math.PI * 0.85);
+        cisternGeo.rotateZ(Math.PI * 0.25);
+        cisternGeo.rotateX(Math.PI * 0.3);
+        const cisternMat = new THREE.MeshPhysicalMaterial({
+          color: 0xf59e0b,
+          roughness: 0.3,
+          metalness: 0.15,
+          clearcoat: 0.4,
+        });
+        const cistern = new THREE.Mesh(cisternGeo, cisternMat);
+        cistern.position.set(g * 0.32, g * 0.18, -g * 0.25);
+        golgiGroup.add(cistern);
+      }
+      // Budding secretory vesicles from Golgi
+      for (let v = 0; v < 6; v++) {
+        const vGeo = new THREE.SphereGeometry(0.13, 8, 8);
+        const vMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.3 });
+        const ves = new THREE.Mesh(vGeo, vMat);
+        ves.position.set(
+          1.1 + (Math.random() - 0.5) * 0.9,
+          (Math.random() - 0.5) * 0.9,
+          (Math.random() - 0.5) * 0.9
+        );
+        golgiGroup.add(ves);
+      }
+      golgiGroup.name = 'golgi-apparatus';
+      innerGroup.add(golgiGroup);
+      interactivePartsMapRef.current.set(golgiGroup, 'golgi-apparatus');
+
+      // 6. Mitochondria (Mini Powerhouse Capsules in Cytosol)
+      const mitoPositions = [
+        { pos: new THREE.Vector3(-3.2, 1.8, 1.2), rot: new THREE.Vector3(0.4, 0.6, 0.2) },
+        { pos: new THREE.Vector3(2.8, -2.2, 1.5), rot: new THREE.Vector3(-0.3, 0.8, 0.4) },
+        { pos: new THREE.Vector3(-2.6, -2.5, -1.4), rot: new THREE.Vector3(0.8, -0.4, 0.3) },
+        { pos: new THREE.Vector3(3.0, 2.6, -0.8), rot: new THREE.Vector3(-0.5, 0.2, 0.7) },
+      ];
+
+      mitoPositions.forEach((mConf, idx) => {
+        const miniMitoGroup = new THREE.Group();
+        miniMitoGroup.position.copy(mConf.pos);
+        miniMitoGroup.rotation.set(mConf.rot.x, mConf.rot.y, mConf.rot.z);
+
+        const mitoGeo = new THREE.CapsuleGeometry(0.44, 1.2, 16, 16);
+        mitoGeo.rotateZ(Math.PI / 2);
+        const mitoMat = new THREE.MeshPhysicalMaterial({
+          color: 0xf97316,
+          roughness: 0.35,
+          metalness: 0.1,
+          clearcoat: 0.4,
+          emissive: 0xc2410c,
+          emissiveIntensity: 0.25,
+        });
+        const mitoMesh = new THREE.Mesh(mitoGeo, mitoMat);
+        mitoMesh.name = 'mitochondria';
+        miniMitoGroup.add(mitoMesh);
+
+        // Subtle internal crista shelf
+        const ridgeGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.8, 12);
+        ridgeGeo.rotateZ(Math.PI / 2);
+        const ridgeMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+        const ridge = new THREE.Mesh(ridgeGeo, ridgeMat);
+        miniMitoGroup.add(ridge);
+
+        innerGroup.add(miniMitoGroup);
+        cellMitoMeshesRef.current.push(mitoMesh);
+        interactivePartsMapRef.current.set(mitoMesh, 'mitochondria');
+      });
+
+      // 7. Lysosomes & Peroxisomes (Digestive Enzyme Vesicles)
+      const lysoPositions = [
+        new THREE.Vector3(1.6, 3.2, 1.0),
+        new THREE.Vector3(-3.5, 0.3, 2.5),
+        new THREE.Vector3(2.1, -3.2, -1.0),
+        new THREE.Vector3(-1.8, 2.9, -2.2),
+        new THREE.Vector3(0.9, -3.6, 1.8),
+      ];
+
+      lysoPositions.forEach((lPos) => {
+        const lysoGeo = new THREE.SphereGeometry(0.38, 16, 16);
+        const lysoMat = new THREE.MeshPhysicalMaterial({
+          color: 0x10b981,
+          roughness: 0.25,
+          metalness: 0.1,
+          clearcoat: 0.5,
+          emissive: 0x047857,
+          emissiveIntensity: 0.25,
+        });
+        const lysoMesh = new THREE.Mesh(lysoGeo, lysoMat);
+        lysoMesh.position.copy(lPos);
+        lysoMesh.name = 'lysosomes';
+        innerGroup.add(lysoMesh);
+        interactivePartsMapRef.current.set(lysoMesh, 'lysosomes');
+      });
+
+      // 8. Centrosome (Pair of Orthogonal Centrioles with Microtubule Asters)
+      const centroGroup = new THREE.Group();
+      centroGroup.position.set(-1.6, 2.3, 0.5);
+      const centrioleGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.7, 12);
+      const centrioleMat = new THREE.MeshPhysicalMaterial({
+        color: 0x6366f1,
+        roughness: 0.3,
+        metalness: 0.2,
+      });
+
+      const cent1 = new THREE.Mesh(centrioleGeo, centrioleMat);
+      cent1.position.set(0, 0, 0);
+      centroGroup.add(cent1);
+
+      const cent2 = new THREE.Mesh(centrioleGeo, centrioleMat);
+      cent2.position.set(0.3, 0, 0);
+      cent2.rotateZ(Math.PI / 2);
+      centroGroup.add(cent2);
+
+      // Microtubule rays radiating outward
+      for (let mt = 0; mt < 6; mt++) {
+        const mtAng = (mt / 6) * Math.PI * 2;
+        const mtGeo = new THREE.CylinderGeometry(0.03, 0.03, 1.8, 6);
+        const mtMat = new THREE.MeshBasicMaterial({ color: 0x818cf8 });
+        const mtMesh = new THREE.Mesh(mtGeo, mtMat);
+        mtMesh.position.set(Math.cos(mtAng) * 0.9, Math.sin(mtAng) * 0.9, 0);
+        mtMesh.rotation.z = mtAng + Math.PI / 2;
+        centroGroup.add(mtMesh);
+      }
+
+      centroGroup.name = 'centrosome';
+      innerGroup.add(centroGroup);
+      interactivePartsMapRef.current.set(cent1, 'centrosome');
+
+      // 9. Streaming Cytoplasmic Vesicle Particle Field (Cytosol)
+      const cytosolCount = 130;
+      const cytosolGeo = new THREE.BufferGeometry();
+      const cytosolPositions = new Float32Array(cytosolCount * 3);
+      for (let i = 0; i < cytosolCount; i++) {
+        const u = Math.random();
+        const v = Math.random();
+        const theta = u * 2.0 * Math.PI;
+        const phi = Math.acos(2.0 * v - 1.0);
+        const r = 2.4 + Math.cbrt(Math.random()) * 3.8;
+        cytosolPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        cytosolPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+        cytosolPositions[i * 3 + 2] = r * Math.cos(phi);
+      }
+      cytosolGeo.setAttribute('position', new THREE.BufferAttribute(cytosolPositions, 3));
+      const cytosolMat = new THREE.PointsMaterial({
+        color: 0x06b6d4,
+        size: 0.16,
+        transparent: true,
+        opacity: 0.85,
+      });
+      const cytosolPoints = new THREE.Points(cytosolGeo, cytosolMat);
+      cytosolPoints.name = 'cytosol';
+      scene.add(cytosolPoints);
+      cytosolParticlesRef.current = cytosolPoints;
     } else {
       // -------------------------------------------------------------
       // SARCOMERE / MUSCLE TISSUE: Z-Discs, Actin thin filaments, Myosin thick filaments with heads
@@ -667,22 +953,21 @@ export const CellOrganelle3DViewer: React.FC<CellOrganelle3DViewerProps> = ({
     renderer.domElement.addEventListener('pointerdown', handlePointerDown);
 
     // -------------------------------------------------------------
-    // ANIMATION TICK LOOP
+    // ANIMATION TICK LOOP (Robust, Crash-free WebGL rendering)
     // -------------------------------------------------------------
-    let clock = new THREE.Clock();
+    const clock = new THREE.Clock();
     let pulseProgress = 0;
 
     const tick = () => {
-      const dt = clock.getDelta();
+      const dt = Math.min(clock.getDelta(), 0.1);
       const time = clock.getElapsedTime();
 
       if (controlsRef.current) {
         controlsRef.current.update();
       }
 
-      // Auto-rotation when not clicking
+      // Auto-rotation for 3D depth
       if (isPlaying && sceneRef.current) {
-        // Slow subtle rotation for depth
         sceneRef.current.rotation.y += dt * 0.12 * simSpeed;
       }
 
@@ -722,7 +1007,22 @@ export const CellOrganelle3DViewer: React.FC<CellOrganelle3DViewerProps> = ({
         }
       }
 
-      // 3. SARCOMERE CONTRACTION CYCLE
+      // 3. EUKARYOTIC CELLULAR STRUCTURE STREAMING & PULSE
+      if (isCellularStructure) {
+        // Cytosol streaming vesicles orbit slowly
+        if (cytosolParticlesRef.current && isPlaying) {
+          cytosolParticlesRef.current.rotation.y += dt * 0.25 * simSpeed;
+          cytosolParticlesRef.current.rotation.x += dt * 0.1 * simSpeed;
+        }
+        // Mitochondria subtle bioenergetic emissive pulse
+        cellMitoMeshesRef.current.forEach((m, idx) => {
+          if (m.material && (m.material as any).emissiveIntensity !== undefined) {
+            (m.material as any).emissiveIntensity = 0.25 + Math.sin(time * 3 + idx) * 0.15;
+          }
+        });
+      }
+
+      // 4. SARCOMERE CONTRACTION CYCLE
       if (isSarcomere && isPlaying) {
         const contraction = Math.sin(time * 3 * simSpeed) * 0.8;
         if (outerEnvelopeGroupRef.current) {
@@ -740,36 +1040,16 @@ export const CellOrganelle3DViewer: React.FC<CellOrganelle3DViewerProps> = ({
       }
 
       renderer.render(scene, camera);
-
-      if (isSoftwareGl) {
-        // Safe paced software rendering
-        const gl = renderer.getContext() as WebGL2RenderingContext;
-        const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
-        gl.flush();
-        const poll = () => {
-          const state = sync && gl.getSyncParameter(sync, gl.SYNC_STATUS);
-          if (state === gl.UNSIGNALED) {
-            timeoutRef.current = window.setTimeout(poll, 6);
-          } else {
-            gl.deleteSync(sync);
-            timeoutRef.current = window.setTimeout(() => {
-              animFrameRef.current = requestAnimationFrame(tick);
-            }, 75);
-          }
-        };
-        timeoutRef.current = window.setTimeout(poll, 6);
-      } else {
-        animFrameRef.current = requestAnimationFrame(tick);
-      }
+      animFrameRef.current = requestAnimationFrame(tick);
     };
 
     animFrameRef.current = requestAnimationFrame(tick);
 
-    // Resize handler
+    // Safe Resize Handler with Dimension Bounds
     const handleResize = () => {
       if (!container || !rendererRef.current || !cameraRef.current) return;
-      const nw = container.clientWidth;
-      const nh = container.clientHeight;
+      const nw = Math.max(container.clientWidth || 0, 320);
+      const nh = Math.max(container.clientHeight || 0, 240);
       cameraRef.current.aspect = nw / nh;
       cameraRef.current.updateProjectionMatrix();
       rendererRef.current.setSize(nw, nh);
@@ -834,6 +1114,9 @@ export const CellOrganelle3DViewer: React.FC<CellOrganelle3DViewerProps> = ({
       } else if (isMitochondria) {
         camera.position.set(0, 3, 9);
         controls.target.set(0, 1, 0);
+      } else if (isCellularStructure) {
+        camera.position.set(0, 2, 11);
+        controls.target.set(0, 0, 0);
       } else {
         camera.position.set(0, 1, 10);
         controls.target.set(0, 0, 0);
@@ -856,7 +1139,7 @@ export const CellOrganelle3DViewer: React.FC<CellOrganelle3DViewerProps> = ({
         <div className="pointer-events-auto px-3 py-1.5 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 shadow-md flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-100">
           <Activity className="w-4 h-4 text-indigo-500 animate-spin-slow" />
           <span>
-            {isNeuron ? '3D Multipolar Neuron Mesh' : isMitochondria ? '3D Mitochondrion Cutaway' : '3D Sarcomere Engine'}
+            {isNeuron ? '3D Multipolar Neuron Mesh' : isMitochondria ? '3D Mitochondrion Cutaway' : isCellularStructure ? '3D Eukaryotic Cell Structure' : '3D Sarcomere Engine'}
           </span>
           <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-mono">
             Orbital Inspector
@@ -902,6 +1185,18 @@ export const CellOrganelle3DViewer: React.FC<CellOrganelle3DViewerProps> = ({
           >
             <Flame className="w-3.5 h-3.5 fill-white" />
             <span>{simSpeed > 1 ? 'High ATP Output' : 'Boost ATP Engine'}</span>
+          </button>
+        )}
+
+        {isCellularStructure && (
+          <button
+            type="button"
+            onClick={() => setSimSpeed((prev) => (prev >= 2 ? 1 : 2.5))}
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white text-xs font-bold shadow-md shadow-cyan-500/20 flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+            title="Accelerate cytoplasmic streaming & vesicle transport"
+          >
+            <Zap className="w-3.5 h-3.5 fill-white" />
+            <span>{simSpeed > 1 ? 'High Streaming' : 'Boost Cytosol'}</span>
           </button>
         )}
       </div>
@@ -1079,7 +1374,7 @@ export const CellOrganelle3DViewer: React.FC<CellOrganelle3DViewerProps> = ({
                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
               >
-                {isNeuron ? 'Soma' : isMitochondria ? 'Matrix' : 'Core'}
+                {isNeuron ? 'Soma' : isMitochondria ? 'Matrix' : isCellularStructure ? 'Nucleus' : 'Core'}
               </button>
             </div>
           </div>
